@@ -1,0 +1,267 @@
+<com.zhy.android.percent.support.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    tools:context="com.zxwl.frame.fragment.ConfControlFragment">
+
+    <!--右边控制栏和信息-start-->
+    <TextView
+        android:id="@+id/tv_split_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:drawableLeft="@mipmap/icon_conf_info"
+        android:drawablePadding="6dp"
+        android:paddingBottom="6dp"
+        android:paddingLeft="6dp"
+        android:paddingTop="6dp"
+        android:text="分屏控制"
+        android:textColor="#FAB951"
+        android:textSize="16sp"
+        app:layout_widthPercent="25%"/>
+
+    <View
+        android:id="@+id/view_line_one"
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tv_split_screen"
+        android:background="#EFEFEF"
+        app:layout_widthPercent="25%"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/rl_buttom_operate"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/view_line_one"
+        app:layout_widthPercent="25%"
+        />
+
+    <!--右边控制栏和信息-end-->
+
+    <View
+        android:id="@+id/view_center"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@id/tv_split_screen"
+        android:background="#F5F5F5"/>
+
+    <!--左侧分屏信息-start-->
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/view_center"
+        android:paddingBottom="6dp"
+        android:paddingLeft="24dp"
+        android:paddingTop="6dp"
+        android:text="北京西城讨论会"
+        android:textSize="16sp"/>
+
+    <!--底部保存按钮-start-->
+    <RelativeLayout
+        android:id="@+id/rl_buttom_operate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp">
+
+        <View
+            android:id="@+id/buttom_view_center"
+            android:layout_width="80dp"
+            android:layout_height="10dp"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/tv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/buttom_view_center"
+            android:background="@drawable/bg_save_bt"
+            android:gravity="center"
+            android:paddingBottom="6dp"
+            android:paddingLeft="60dp"
+            android:paddingRight="60dp"
+            android:paddingTop="6dp"
+            android:text="保存"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:id="@+id/tv_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/buttom_view_center"
+            android:background="@drawable/bg_reset_bt"
+            android:gravity="center"
+            android:paddingBottom="6dp"
+            android:paddingLeft="60dp"
+            android:paddingRight="60dp"
+            android:paddingTop="6dp"
+            android:text="重置"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_spilt_operate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/rl_buttom_operate"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/view_center"
+        android:paddingBottom="6dp"
+        android:paddingTop="6dp">
+
+        <TextView
+            android:id="@+id/tv_all_split"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="12dp"
+            android:background="@drawable/bg_template"
+            android:gravity="center"
+            android:paddingBottom="6dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="6dp"
+            android:text="全部"
+            android:textColor="@android:color/white"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/tv_all_split"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/icon_split_one"/>
+
+                <ImageView
+                    android:id="@+id/iv_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_two_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_three_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_four"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_four_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_five"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_five_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_six"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_six_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_seven"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_seven_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_eight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_eight_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_nine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_nine"/>
+
+                <ImageView
+                    android:id="@+id/iv_ten"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_ten_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_thirteen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_thirteen_a"/>
+
+                <ImageView
+                    android:id="@+id/iv_sixteen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_sixteen"/>
+
+                <ImageView
+                    android:id="@+id/iv_twenty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_twenty"/>
+
+                <ImageView
+                    android:id="@+id/iv_twenty_four"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:src="@mipmap/icon_split_twenty_four"/>
+
+            </LinearLayout>
+        </HorizontalScrollView>
+    </RelativeLayout>
+
+
+    <com.miao.freesizedraggablelayout.FreeSizeDraggableLayout
+        android:id="@+id/fsd_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rl_spilt_operate"
+        android:layout_below="@id/tv_title"
+        android:layout_toLeftOf="@id/view_center"
+        />
+    <!--左侧分屏信息-end-->
+
+</com.zhy.android.percent.support.PercentRelativeLayout>

@@ -1,0 +1,64 @@
+<com.zhy.android.percent.support.PercentLinearLayout
+    android:id="@+id/ll_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/rl_operate"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tv_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:padding="10dp"
+        android:paddingBottom="10dp"
+        android:singleLine="true"
+        android:text="全选"
+        android:textColor="#4F4F4F"
+        android:textSize="16sp"
+        app:layout_widthPercent="20%"/>
+
+    <TextView
+        android:id="@+id/tv_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:padding="10dp"
+        android:paddingBottom="10dp"
+        android:singleLine="true"
+        android:text="序号"
+        android:textColor="#4F4F4F"
+        android:textSize="16sp"
+        app:layout_widthPercent="10%"/>
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="会议室名称"
+        android:textColor="#4F4F4F"
+        android:textSize="16sp"
+        app:layout_widthPercent="50%"/>
+
+    <TextView
+        android:id="@+id/tv_operate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="操作"
+        android:textColor="#4F4F4F"
+        android:textSize="16sp"
+        app:layout_widthPercent="20%"/>
+
+</com.zhy.android.percent.support.PercentLinearLayout>
