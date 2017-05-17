@@ -295,6 +295,7 @@ public interface ConfApi {
     @GET(Urls.CALL_SITE)
     Observable<String> callSite(@Query("smcConfId") String smcConfId,
                                 @Query("siteUris") String siteUris);
+
     /**
      * 会场控制:断开会场
      * 参数:
@@ -304,6 +305,34 @@ public interface ConfApi {
      */
     @GET(Urls.DISCONNECT_SITE)
     Observable<String> disconnectSite(@Query("smcConfId") String smcConfId,
-                                @Query("siteUris") String siteUris);
+                                      @Query("siteUris") String siteUris);
+
+    /**
+     * 设置分屏
+     *
+     * @param confId          会议id
+     * @param target          多画面标识，一般为空串
+     * @param presenceMode    多画面模式
+     * @param subPics         会场标识列表
+     * @param splitScreenTime 轮询间隔时间 单位秒
+     * @return
+     */
+    @GET(Urls.SPLIT_SCREEN)
+    Observable<String> setSplitScreen(@Query("confId") String confId,
+                                      @Query("target") String target,
+                                      @Query("presenceMode") String presenceMode,
+                                      @Query("subPics") String subPics,
+                                      @Query("splitScreenTime") String splitScreenTime);
+
+    /**
+     * 设置多画面参数
+     *
+     * @param confId      会议id
+     * @param isBroadcase 0 开始广播多画面 1 停止广播多画面
+     * @return
+     */
+    @GET(Urls.SET_BROADCAST_CONTINUOUS_PRESENCE)
+    Observable<String> setBroadcastContinuousPresence(@Query("confId") String confId,
+                                                      @Query("isBroadcase") String isBroadcase);
 }
 

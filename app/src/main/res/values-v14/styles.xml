@@ -37,7 +37,8 @@
 
     <style name="dialogstyle" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <!--设置dialog的背景-->
-        <item name="android:windowBackground">@drawable/bg_booking_meeting_input</item>
+        <!--<item name="android:windowBackground">@drawable/bg_booking_meeting_input</item>-->
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>

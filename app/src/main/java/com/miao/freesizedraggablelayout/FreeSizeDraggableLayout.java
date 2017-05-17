@@ -73,6 +73,7 @@ public class FreeSizeDraggableLayout extends ViewGroup {
     private boolean mGroupChangeEnable = true;
     private long mResponseTime = 300;
     private Handler mHandler = new Handler();
+
 //    private boolean mPress = false;
 //    private Vibrator mVibrator;
 //    private Runnable mPressHandler = new Runnable() {

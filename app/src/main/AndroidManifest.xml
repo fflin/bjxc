@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.READ_LOGS"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -44,8 +43,7 @@
         <activity
             android:name=".activity.LoginActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="landscape"
-            />
+            android:screenOrientation="landscape"/>
 
         <!-- 会议预约界面 -->
         <activity
@@ -57,7 +55,6 @@
         <activity
             android:name=".activity.HomeActivity"
             android:screenOrientation="landscape">
-
         </activity>
 
         <!-- 会议预约 -->
@@ -83,24 +80,22 @@
             android:screenOrientation="landscape">
         </activity>
 
-        <!--会议控制列表-->
+        <!-- 会议控制列表 -->
         <activity
             android:name=".activity.ConfControlListActivity"
             android:screenOrientation="landscape">
         </activity>
-        <!--会议控制界面-->
+        <!-- 会议控制界面 -->
         <activity
             android:name=".activity.ConfControlActivity"
             android:screenOrientation="landscape">
         </activity>
-
-
         <activity
             android:name=".activity.ContactBookDialogActivity"
             android:theme="@style/dialogstyle">
         </activity>
-        <!--锁屏-->
-        <service android:name=".views.lockscreen.LockScreenService"></service>
+        <!-- 锁屏 -->
+        <service android:name=".views.lockscreen.LockScreenService"/>
 
         <activity
             android:name=".activity.LauncherHomeActivity"
@@ -126,6 +121,10 @@
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.SplitScreenDialogActivity"
+                  android:theme="@style/dialogstyle"
+            >
         </activity>
     </application>
 

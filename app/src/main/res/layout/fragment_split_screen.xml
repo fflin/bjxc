@@ -7,11 +7,31 @@
     android:clipChildren="false"
     tools:context="com.zxwl.frame.fragment.ConfControlFragment">
 
+    <FrameLayout
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rl_spilt_operate"
+        android:layout_below="@id/tv_title"
+        android:layout_toLeftOf="@id/view_center"
+        android:visibility="gone">
+
+    </FrameLayout>
+
+    <com.miao.freesizedraggablelayout.FreeSizeDraggableLayout
+        android:id="@+id/fsd_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rl_spilt_operate"
+        android:layout_below="@id/tv_title"
+        android:layout_toLeftOf="@id/view_center"
+        />
+
     <!--右边控制栏和信息-start-->
     <TextView
         android:id="@+id/tv_split_screen"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:drawableLeft="@mipmap/icon_conf_info"
         android:drawablePadding="6dp"
@@ -73,6 +93,7 @@
         android:paddingBottom="8dp"
         android:paddingTop="8dp">
 
+
         <View
             android:id="@+id/buttom_view_center"
             android:layout_width="80dp"
@@ -109,6 +130,30 @@
             android:text="重置"
             android:textColor="@android:color/white"
             android:textSize="14sp"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_poll_lable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="轮询多画面"
+            android:layout_marginLeft="12dp"
+            android:layout_alignBaseline="@+id/tv_save"
+            android:layout_alignBottom="@+id/tv_save"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+        <ch.ielse.view.SwitchView
+            android:id="@+id/sv_poll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/tv_save"
+            android:layout_alignTop="@id/tv_save"
+            android:layout_marginLeft="12dp"
+            android:layout_toRightOf="@id/tv_poll_lable"
+            android:paddingBottom="3dp"
+            android:paddingTop="3dp"
             />
     </RelativeLayout>
 
@@ -253,15 +298,6 @@
         </HorizontalScrollView>
     </RelativeLayout>
 
-
-    <com.miao.freesizedraggablelayout.FreeSizeDraggableLayout
-        android:id="@+id/fsd_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/rl_spilt_operate"
-        android:layout_below="@id/tv_title"
-        android:layout_toLeftOf="@id/view_center"
-        />
     <!--左侧分屏信息-end-->
 
 </com.zhy.android.percent.support.PercentRelativeLayout>

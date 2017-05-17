@@ -25,6 +25,8 @@ import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
 import com.zxwl.frame.bean.Site;
 import com.zxwl.frame.net.api.ConfApi;
+import com.zxwl.frame.net.callback.RxSubscriber;
+import com.zxwl.frame.net.exception.ResponeThrowable;
 import com.zxwl.frame.net.http.HttpUtils;
 
 import org.json.JSONArray;
@@ -66,12 +68,9 @@ public class ConfControlFragment extends BaseFragment {
     private TwinklingRefreshLayout refreshLayout;
     private RecyclerView rvList;
     private ConfControlGridAdapter adapter;
-//    private List<Site> beanList = new ArrayList<>();
-
-//    private int PAGE_SIZE = 5;
-//    private int PAGE_NUM = 0;
 
     private String smcConfId;//会议id
+    private String confId;
 
     private Gson gson = new Gson();
     private ConferenceInfo conferenceInfo;//会议信息
@@ -88,10 +87,11 @@ public class ConfControlFragment extends BaseFragment {
     public ConfControlFragment() {
     }
 
-    public static ConfControlFragment newInstance(String smcConfId) {
+    public static ConfControlFragment newInstance(String smcConfId, String confId) {
         ConfControlFragment fragment = new ConfControlFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ConfControlActivity.SMC_CONF_ID, smcConfId);
+        bundle.putString(ConfControlActivity.CONF_ID, confId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -123,6 +123,7 @@ public class ConfControlFragment extends BaseFragment {
     protected void init() {
         Bundle arguments = getArguments();
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
+        confId = (String) arguments.get(ConfControlActivity.CONF_ID);
 
         initRefresh();
 
@@ -241,11 +242,11 @@ public class ConfControlFragment extends BaseFragment {
     private void setAdapterShow(int position) {
         for (int i = 0, count = siteList.size(); i < count; i++) {
             if (i != position) {
-                siteList.get(i).showControl = false;
+                siteList.get(i).showRemoveControl = false;
             }
         }
         Site site = siteList.get(position);
-        site.showControl = !site.showControl;
+        site.showRemoveControl = !site.showRemoveControl;
         adapter.notifyDataSetChanged();
     }
 
@@ -289,57 +290,64 @@ public class ConfControlFragment extends BaseFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        s -> {
-                            try {
-                                if (TextUtils.isEmpty(s)) {
-                                    Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
-                                    return;
+                        new RxSubscriber<String>() {
+                            @Override
+                            public void onSuccess(String s) {
+                                try {
+                                    if (TextUtils.isEmpty(s)) {
+                                        Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    JSONObject object = new JSONObject(s);
+                                    JSONArray array = object.getJSONArray("conference");
+                                    //会议信息
+                                    String s1 = array.getString(0);
+                                    conferenceInfo = gson.fromJson(s1, ConferenceInfo.class);
+
+                                    //会议状态
+                                    String s2 = array.getString(1);
+                                    conferenceStatus = gson.fromJson(s2, ConferenceStatus.class);
+
+                                    //参会的会场列表
+                                    String s3 = array.getString(2);
+                                    siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {
+                                    }.getType());
+
+                                    //设置bean的操作状态
+                                    for (int i = 0, count = siteList.size(); i < count; i++) {
+                                        siteList.get(i).showRemoveControl = false;
+                                    }
+
+                                    //刷新适配器
+                                    adapter.addAll(siteList);
+
+                                    // 会议状态信息填写
+                                    tvTitle.setText(conferenceStatus.name);
+                                    tvAssemblyName.setText("会议名称：" + conferenceStatus.name);//会议名称
+                                    tvStartTime.setText("召开时间：" + conferenceStatus.beginTime);//召开时间
+                                    tvEndTime.setText("结束时间：" + conferenceStatus.endTime);//结束时间
+                                    tvLectureHall.setText("演讲会场：" + conferenceStatus.speaking);//演讲会场
+                                    tvChairmanHall.setText("主席会场：" + conferenceStatus.chair);//主席会场
+                                    tvBroadcastHall.setText("广播会场：" + conferenceStatus.broadcast);//广播会场
+                                    tvSecondaryHall.setText("辅流会场：" + conferenceStatus.presentation);//辅流会场
+                                    //设置声控切换的状态
+                                    audioSwitch = conferenceStatus.isAudioSwitch;
+                                    //设置声音切换的状态
+                                    svSetVoice.setOpened(0 == audioSwitch);
+                                    tvVoiceSwitch.setText("声控切换：" + (0 == audioSwitch ? "打开" : "关闭"));//声控切换
+
+                                    //设置控件的点击事件
+                                    setListener();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                JSONObject object = new JSONObject(s);
-                                JSONArray array = object.getJSONArray("conference");
-                                //会议信息
-                                String s1 = array.getString(0);
-                                conferenceInfo = gson.fromJson(s1, ConferenceInfo.class);
-
-                                //会议状态
-                                String s2 = array.getString(1);
-                                conferenceStatus = gson.fromJson(s2, ConferenceStatus.class);
-
-                                //参会的会场列表
-                                String s3 = array.getString(2);
-                                siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {
-                                }.getType());
-
-                                //设置bean的操作状态
-                                for (int i = 0, count = siteList.size(); i < count; i++) {
-                                    siteList.get(i).showControl = false;
-                                }
-
-                                //刷新适配器
-                                adapter.addAll(siteList);
-
-                                // 会议状态信息填写
-                                tvTitle.setText(conferenceStatus.name);
-                                tvAssemblyName.setText("会议名称：" + conferenceStatus.name);//会议名称
-                                tvStartTime.setText("召开时间：" + conferenceStatus.beginTime);//召开时间
-                                tvEndTime.setText("结束时间：" + conferenceStatus.endTime);//结束时间
-                                tvLectureHall.setText("演讲会场：" + conferenceStatus.speaking);//演讲会场
-                                tvChairmanHall.setText("主席会场：" + conferenceStatus.chair);//主席会场
-                                tvBroadcastHall.setText("广播会场：" + conferenceStatus.broadcast);//广播会场
-                                tvSecondaryHall.setText("辅流会场：" + conferenceStatus.presentation);//辅流会场
-                                //设置声控切换的状态
-                                audioSwitch = conferenceStatus.isAudioSwitch;
-                                //设置声音切换的状态
-                                svSetVoice.setOpened(0 == audioSwitch);
-                                tvVoiceSwitch.setText("声控切换：" + (0 == audioSwitch ? "打开" : "关闭"));//声控切换
-
-                                //设置控件的点击事件
-                                setListener();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-                        }, responeThrowable -> {
-                            Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
+
+                            @Override
+                            protected void onError(ResponeThrowable responeThrowable) {
+                                Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
+
+                            }
                         }
                 );
     }
@@ -352,6 +360,7 @@ public class ConfControlFragment extends BaseFragment {
      * @param siteUris  会场uri
      * @param position  adapter位置
      */
+
     private void delSIte(String smcConfId,
                          String confId,
                          String siteUris,

@@ -92,7 +92,6 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
                 break;
 
             case R.id.tv_template_manage:
-                ConfControlActivity.startActivity(this, "");
                 Toast.makeText(this, "此功能正在开发中", Toast.LENGTH_SHORT).show();
                 break;
             default:

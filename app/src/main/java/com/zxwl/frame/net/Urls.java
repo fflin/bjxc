@@ -9,6 +9,7 @@ package com.zxwl.frame.net;
 public class Urls {
 //    public static final String BASE_URL = "http://192.168.222.137/hbsw/";
     public static final String BASE_URL = "http://192.168.0.122:8080/bjxc/";
+//    public static final String BASE_URL = "http://192.168.222.233:10119/bjxc/";
 
     /**
      * 登录的url
@@ -221,6 +222,24 @@ public class Urls {
      * siteUris
      */
     public static final String DISCONNECT_SITE = "confControlAction_disconnectVideoSite.action";
+
+    /**
+     * 设定分屏
+     * 参数:
+     * confId : 会议id
+     * target : 多画面标识，一般为空串
+     * presenceMode : 分屏模式
+     * subPics: 会场标识列表
+     */
+    public static final String SPLIT_SCREEN = "confControlAction_splitScreen.action";
+
+    /**
+     * 设置广播多画面
+     * 参数:
+     * confId : 会议id
+     * isBroadcase : 0 开始广播多画面 1 停止广播多画面
+     */
+    public static final String SET_BROADCAST_CONTINUOUS_PRESENCE = "confControlAction_setBroadcastContinuousPresenceEx.action";
 
 
     //    confControlAction_changeIsSplitScreen.action

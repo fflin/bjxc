@@ -40,7 +40,7 @@ public class ConfControlGridAdapter extends RecyclerView.Adapter<ConfControlGrid
         holder.tvName.setText(site.siteInfo.name);
 
         //0=View.VISIBLE    4=View.INVISIBLE
-        if (site.showControl) {
+        if (site.showRemoveControl) {
             holder.tvRemove.setVisibility(View.VISIBLE);
             holder.ivImg.setVisibility(View.INVISIBLE);
             holder.tvName.setBackgroundColor(0XFF56D6C7);

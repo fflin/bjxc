@@ -17,6 +17,7 @@ import com.zxwl.frame.R;
 import com.zxwl.frame.adapter.ConfControlAdapter;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.DataList;
+import com.zxwl.frame.bean.UserInfo;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.utils.UserHelper;
@@ -77,7 +78,10 @@ public class ConfControlListActivity extends BaseActivity {
         tvHome.setVisibility(View.VISIBLE);
         tvName.setVisibility(View.VISIBLE);
 
-        tvName.setText(UserHelper.getSavedUser().name);
+        UserInfo userInfo = UserHelper.getSavedUser();
+        if (null != userInfo) {
+            tvName.setText(userInfo.name);
+        }
 
         adapter = new ConfControlAdapter(list);
         adapter.setOnItemClickListener(new ConfControlAdapter.onItemClickListener() {
@@ -90,7 +94,7 @@ public class ConfControlListActivity extends BaseActivity {
             public void onControl(int position) {
                 setAdapterShow(position);
                 //控制会议
-                ConfControlActivity.startActivity(ConfControlListActivity.this, list.get(position).smcConfId);
+                ConfControlActivity.startActivity(ConfControlListActivity.this, list.get(position).smcConfId,list.get(position).id);
             }
 
             @Override

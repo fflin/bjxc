@@ -68,7 +68,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
     public AssemblyRoomControlFragment() {
     }
 
-    public static AssemblyRoomControlFragment newInstance(String smcConfId) {
+    public static AssemblyRoomControlFragment newInstance(String smcConfId, String confId) {
         AssemblyRoomControlFragment fragment = new AssemblyRoomControlFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ConfControlActivity.SMC_CONF_ID, smcConfId);
@@ -289,7 +289,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
                                 }.getType());
 
                                 for (int i = 0, count = siteList.size(); i < count; i++) {
-                                    siteList.get(i).showControl = false;
+                                    siteList.get(i).showRemoveControl = false;
                                 }
 
                                 //刷新适配器
@@ -446,11 +446,11 @@ public class AssemblyRoomControlFragment extends BaseFragment {
     private void setAdapterShow(int position) {
         for (int i = 0, count = beanList.size(); i < count; i++) {
             if (i != position) {
-                beanList.get(i).showControl = false;
+                beanList.get(i).showRemoveControl = false;
             }
         }
         Site site = beanList.get(position);
-        site.showControl = !site.showControl;
+        site.showRemoveControl = !site.showRemoveControl;
         adapter.notifyDataSetChanged();
     }
 }

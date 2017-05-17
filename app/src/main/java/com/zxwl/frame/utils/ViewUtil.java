@@ -2,8 +2,6 @@ package com.zxwl.frame.utils;
 
 import android.view.View;
 
-import com.orhanobut.logger.Logger;
-
 /**
  * author：hw
  * data:2017/5/11 17:03
@@ -29,7 +27,6 @@ public class ViewUtil {
         int right = left + view.getWidth();
         int bottom = top + view.getHeight();
         if (y >= top && y <= bottom && x >= left && x <= right) {
-            Logger.i("包含");
             return true;
         }
         return false;

@@ -20,6 +20,7 @@ import com.zxwl.frame.adapter.ConfApprovalGridAdapter;
 import com.zxwl.frame.adapter.ConfApprovalListAdapter;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.DataList;
+import com.zxwl.frame.bean.UserInfo;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.rx.RxBus;
@@ -93,7 +94,10 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
         tvHome.setVisibility(View.VISIBLE);
         tvName.setVisibility(View.VISIBLE);
 
-        tvName.setText(UserHelper.getSavedUser().name);
+        UserInfo userInfo = UserHelper.getSavedUser();
+        if (null != userInfo) {
+            tvName.setText(userInfo.name);
+        }
 
         initRecycler();
         initRefresh();
@@ -125,17 +129,33 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
         listAdapter = new ConfApprovalListAdapter(list);
         gridAdapter = new ConfApprovalGridAdapter(list);
         gridAdapter.setOnItemClickListener(
-                position -> {
-                    approvalIndex = position;
-                    ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
+                new ConfApprovalGridAdapter.onItemClickListener() {
+                    @Override
+                    public void onClick(int position) {
+                        approvalIndex = position;
+                        ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
+
+                    }
                 }
+//                position -> {
+//                    approvalIndex = position;
+//                    ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
+//                }
         );
 
         listAdapter.setOnItemClickListener(
-                position -> {
-                    approvalIndex = position;
-                    ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
+                new ConfApprovalListAdapter.onItemClickListener() {
+                    @Override
+                    public void onClick(int position) {
+                        approvalIndex = position;
+                        ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
+
+                    }
                 }
+//                position -> {
+//                    approvalIndex = position;
+//                    ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
+//                }
         );
         //设置recyclerview的适配器和样式管理器
         setRecyclerLayout();

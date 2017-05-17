@@ -29,13 +29,17 @@ public class WelcomActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        new Handler().postDelayed(() -> {
-                    if ("true".equals(hsaLogin)) {
-                        HomeActivity.startActivity(WelcomActivity.this);
-                    } else {
-                        LoginActivity.startActivity(WelcomActivity.this);
+        new Handler().postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if ("true".equals(hsaLogin)) {
+                            HomeActivity.startActivity(WelcomActivity.this);
+                        } else {
+                            LoginActivity.startActivity(WelcomActivity.this);
+                        }
+                        finish();
                     }
-                    finish();
                 }, DELAY_TIME);
     }
 }

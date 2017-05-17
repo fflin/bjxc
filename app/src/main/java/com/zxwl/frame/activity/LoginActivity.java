@@ -13,6 +13,8 @@ import com.zxwl.frame.R;
 import com.zxwl.frame.bean.UserInfo;
 import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.net.api.UserInfoApi;
+import com.zxwl.frame.net.callback.RxSubscriber;
+import com.zxwl.frame.net.exception.ResponeThrowable;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.utils.Toastor;
 import com.zxwl.frame.utils.UserHelper;
@@ -125,23 +127,45 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        //成功操作
-                        userInfo -> {
-                            dialog.dismiss();
-                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                            //存储登录状态
-                            PreferencesHelper.saveData(Account.IS_LOGIN, "true");
-                            //保存用户信息
-                            UserHelper.saveUser(userInfo);
-                            //跳转到登录界面
-                            HomeActivity.startActivity(LoginActivity.this);
-                            finish();
-                        },
-                        //异常时候的操作
-                        responeThrowable -> {
-                            dialog.dismiss();
-                            Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
-                        });
+                        new RxSubscriber<UserInfo>() {
+                            @Override
+                            public void onSuccess(UserInfo userInfo) {
+                                dialog.dismiss();
+                                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                                //存储登录状态
+                                PreferencesHelper.saveData(Account.IS_LOGIN, "true");
+                                //保存用户信息
+                                UserHelper.saveUser(userInfo);
+                                //跳转到登录界面
+                                HomeActivity.startActivity(LoginActivity.this);
+                                finish();
+                            }
+
+                            @Override
+                            protected void onError(ResponeThrowable responeThrowable) {
+                                dialog.dismiss();
+                                Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+//                        //成功操作
+//                        userInfo -> {
+//                            dialog.dismiss();
+//                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+//                            //存储登录状态
+//                            PreferencesHelper.saveData(Account.IS_LOGIN, "true");
+//                            //保存用户信息
+//                            UserHelper.saveUser(userInfo);
+//                            //跳转到登录界面
+//                            HomeActivity.startActivity(LoginActivity.this);
+//                            finish();
+//                        },
+//                        //异常时候的操作
+//                        responeThrowable -> {
+//                            dialog.dismiss();
+//                            Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+//                        }
+                        );
     }
 
 

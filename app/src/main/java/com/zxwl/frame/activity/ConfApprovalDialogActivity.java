@@ -19,6 +19,8 @@ import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.DepartBean;
 import com.zxwl.frame.bean.Employee;
 import com.zxwl.frame.net.api.ConfApi;
+import com.zxwl.frame.net.callback.RxSubscriber;
+import com.zxwl.frame.net.exception.ResponeThrowable;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.net.transformer.ListDefaultTransformer;
 import com.zxwl.frame.rx.RxBus;
@@ -165,7 +167,6 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
             expAdapter = new NewConfExpandableListViewAdapter(ConfApprovalDialogActivity.this, org1Names, maps);
             explv.setAdapter(expAdapter);
         }
-
         return dialogView;
     }
 
@@ -198,15 +199,21 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        s -> {
-                            RxBus.getInstance().post(0);
-                            Toast.makeText(ConfApprovalDialogActivity.this, "会议通过", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }, responeThrowable -> {
-                            Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
-                            finish();
+                        new RxSubscriber<String>() {
+                            @Override
+                            public void onSuccess(String s) {
+                                RxBus.getInstance().post(0);
+                                Toast.makeText(ConfApprovalDialogActivity.this, "会议通过", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
 
-                        });
+                            @Override
+                            protected void onError(ResponeThrowable responeThrowable) {
+                                Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                );
     }
 
     /**

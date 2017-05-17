@@ -18,7 +18,8 @@ public class Site {
     public String terminalName;//终端名称
     public String sound;//麦克风的声音大小设置
 
-    public boolean showControl;//是否显示移除会场控制界面
+    public boolean showRemoveControl;//是否显示移除会场控制界面
+    public boolean splitCheck;//分屏控制是否被选中
 
 //    private SiteInfoEx siteInfo;//会场信息
 //    private SiteStatusEx siteStatus;//会场状态

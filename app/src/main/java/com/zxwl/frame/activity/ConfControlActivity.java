@@ -55,10 +55,12 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
     private MyPagerAdapter pagerAdapter;
 
     public static final String SMC_CONF_ID = "smc_conf_id";
+    public static final String CONF_ID = "conf_id";
 
-    public static void startActivity(Context context, String smcConfId) {
+    public static void startActivity(Context context, String smcConfId,String confId) {
         Intent intent = new Intent(context, ConfControlActivity.class);
         intent.putExtra(SMC_CONF_ID, smcConfId);
+        intent.putExtra(CONF_ID, confId);
         context.startActivity(intent);
     }
 
@@ -86,10 +88,12 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
     protected void initData() {
         //获得会议的id
         String smcConfId = getIntent().getStringExtra(SMC_CONF_ID);
+        String confId = getIntent().getStringExtra(CONF_ID);
 
-        fragmentList.add(ConfControlFragment.newInstance(smcConfId));
-        fragmentList.add(AssemblyRoomControlFragment.newInstance(smcConfId));
-        fragmentList.add(SplitScreenFragment.newInstance(smcConfId));
+        fragmentList.add(ConfControlFragment.newInstance(smcConfId,confId));
+        fragmentList.add(AssemblyRoomControlFragment.newInstance(smcConfId,confId));
+        fragmentList.add(SplitScreenFragment.newInstance(smcConfId,confId));
+//        fragmentList.add(TempFragment.newInstance());
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), fragmentList);
         vpContent.setAdapter(pagerAdapter);
         //设置缓存的数量
