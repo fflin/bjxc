@@ -411,6 +411,11 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     return;
                 }
 
+                if (11!=phone.toString().trim().length()) {
+                    Toast.makeText(this, "联系人电话格式不正确", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 //获得操作人ID
                 //用户信息
                 UserInfo userInfo = UserHelper.getSavedUser();

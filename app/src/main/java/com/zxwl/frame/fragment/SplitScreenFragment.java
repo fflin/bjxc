@@ -34,7 +34,6 @@ import com.zxwl.frame.adapter.SplitScreenRightAdapter;
 import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
 import com.zxwl.frame.bean.Site;
-import com.zxwl.frame.bean.SiteInfo;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
 import com.zxwl.frame.net.exception.ResponeThrowable;
@@ -53,6 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ch.ielse.view.SwitchView;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -102,6 +102,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     private String confId;
     private String presenceMode;//分屏模式
 
+    private Subscription subscription;
 
     public SplitScreenFragment() {
     }
@@ -160,14 +161,14 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
         confId = (String) arguments.get(ConfControlActivity.CONF_ID);
 
-        Site site = null;
-        for (int i = 0; i < 20; i++) {
-            site = new Site();
-            SiteInfo siteInfo = new SiteInfo();
-            siteInfo.name = "name"+i;
-            site.siteInfo = siteInfo;
-            siteList.add(site);
-        }
+//        Site site = null;
+//        for (int i = 0; i < 20; i++) {
+//            site = new Site();
+//            SiteInfo siteInfo = new SiteInfo();
+//            siteInfo.name = "name"+i;
+//            site.siteInfo = siteInfo;
+//            siteList.add(site);
+//        }
 
         rightAdapter = new SplitScreenRightAdapter(siteList);
         rvList.setAdapter(rightAdapter);
@@ -223,11 +224,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             }
         });
 
-        //获得会议信息
-        getConfInfo();
-
-
-        RxBus.getInstance()
+        subscription = RxBus.getInstance()
                 .toObserverable(Intent.class)
                 .compose(this.bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -239,6 +236,9 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                         showNewSplit(currentIndex, currentChlidIndex);
                     }
                 });
+
+        //获得会议信息
+        getConfInfo();
     }
 
     @Override
@@ -371,8 +371,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                             String target,
                             String presenceMode,
                             String subPics,
-                            String splitScreenTime
-    ) {
+                            String splitScreenTime) {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
@@ -393,6 +392,13 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                 });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (null != subscription) {
+            subscription.unsubscribe();
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -431,16 +437,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case R.id.tv_reset:
                 View outerView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_wheel_view, null);
                 WheelView wv = (WheelView) outerView.findViewById(R.id.wheel_view_wv);
-//                wv.setOffset(2);
                 wv.setItems(Arrays.asList("5", "10", "15", "20"));
-//                wv.setSeletion(3);
-//                wv.setOnWheelViewListener(new WheelView.OnWheelViewListener() {
-//                    @Override
-//                    public void onSelected(int selectedIndex, String item) {
-//
-//                        Log.d(TAG, "[Dialog]selectedIndex: " + selectedIndex + ", item: " + item);
-//                    }
-//                });
 
                 MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                         .title("请选择轮询时间")
@@ -451,7 +448,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 pollTime = wv.getSeletedItem();
-                                Toast.makeText(getContext(), pollTime+"秒", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), pollTime + "秒", Toast.LENGTH_SHORT).show();
                             }
                         })
                         .build();
@@ -462,7 +459,6 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                 //点击对话框意外的地方和返回键，对话框都不消失
 //              dialog.setCancelable(false);
                 dialog.show();
-
                 break;
 
             //所有分屏样式
@@ -817,7 +813,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     private void set2_1() {
         fsdLayout.setUnitWidthNum(4);
         fsdLayout.setUnitHeightNum(4);
-        
+
         detailViewList.add(new DetailView(new Point(0, 1), 2, 2, createRecycler()));
         detailViewList.add(new DetailView(new Point(2, 1), 2, 2, createRecycler()));
     }
