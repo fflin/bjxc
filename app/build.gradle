@@ -135,14 +135,19 @@ dependencies {
     compile files('libs/esdk_tp_native_professional_java.jar')//
 
     //
+
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'//
+    compile 'com.dinuscxj:recycleritemdecoration:1.0.0'//
+    //可以编辑的webview
+    compile 'jp.wasabeef:richeditor-android:1.2.2'//
+    compile 'ch.ielse:switchbutton:1.0.0'//
+    //垂直的tablayout
+    compile 'q.rorbin:VerticalTabLayout:1.2.1'//
+    //eventbus
+    compile 'org.greenrobot:eventbus:3.0.0'//
+    //侧滑删除
+    compile 'com.baoyz.swipemenulistview:library:1.3.0'//
     //通用的适配器
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.dinuscxj:recycleritemdecoration:1.0.0'
-    compile 'jp.wasabeef:richeditor-android:1.2.2'
-    compile 'ch.ielse:switchbutton:1.0.0'
-    compile 'q.rorbin:VerticalTabLayout:1.2.1'
-    compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'com.baoyz.swipemenulistview:library:1.3.0'
-    compile 'com.zhy:base-rvadapter:3.0.3'
-    testCompile 'junit:junit:4.12'
+    compile 'com.zhy:base-rvadapter:3.0.3'//
+    testCompile 'junit:junit:4.12'//
 }

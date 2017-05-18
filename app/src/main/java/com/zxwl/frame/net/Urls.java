@@ -8,7 +8,7 @@ package com.zxwl.frame.net;
 
 public class Urls {
 //    public static final String BASE_URL = "http://192.168.222.137/hbsw/";
-    public static final String BASE_URL = "http://192.168.0.122:8080/bjxc/";
+    public static final String BASE_URL = "http://192.168.0.111:8080/bjxc/";
 //    public static final String BASE_URL = "http://192.168.222.233:10119/bjxc/";
 
     /**
