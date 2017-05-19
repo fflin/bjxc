@@ -108,23 +108,6 @@ public class HttpUtils {
     }
 
     /**
-     * 获取请求网络实例
-     *
-     * @return
-     */
-    public static HttpUtils getInstance(Context context) {
-        if (mInstance == null) {
-            synchronized (HttpUtils.class) {
-                if (mInstance == null) {
-                    mInstance = new HttpUtils(context.getApplicationContext());
-                }
-            }
-        }
-        return mInstance;
-    }
-
-
-    /**
      * 设置网络配置参数
      *
      * @param configuration
@@ -142,6 +125,23 @@ public class HttpUtils {
             Logger.i("ConFiguration" + configuration.toString());
         }
 
+    }
+
+
+    /**
+     * 获取请求网络实例
+     *
+     * @return
+     */
+    public static HttpUtils getInstance(Context context) {
+        if (mInstance == null) {
+            synchronized (HttpUtils.class) {
+                if (mInstance == null) {
+                    mInstance = new HttpUtils(context.getApplicationContext());
+                }
+            }
+        }
+        return mInstance;
     }
 
     public RetrofitClient getRetofitClinet() {

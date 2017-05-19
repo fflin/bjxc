@@ -161,15 +161,6 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
         confId = (String) arguments.get(ConfControlActivity.CONF_ID);
 
-//        Site site = null;
-//        for (int i = 0; i < 20; i++) {
-//            site = new Site();
-//            SiteInfo siteInfo = new SiteInfo();
-//            siteInfo.name = "name"+i;
-//            site.siteInfo = siteInfo;
-//            siteList.add(site);
-//        }
-
         rightAdapter = new SplitScreenRightAdapter(siteList);
         rvList.setAdapter(rightAdapter);
         rvList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -407,29 +398,37 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case R.id.tv_save:
                 StringBuilder subPics = new StringBuilder();
                 for (int i = 0, count = detailViewList.size(); i < count; i++) {
+                    StringBuilder childSubPics = new StringBuilder();
                     DetailView detail = detailViewList.get(i);
                     RecyclerView recycler = (RecyclerView) detail.getView();
                     SplitScreenItemAdapter adapter = (SplitScreenItemAdapter) recycler.getAdapter();
                     List<Site> siteList = adapter.getSiteList();
                     for (int j = 0; j < siteList.size(); j++) {
-                        subPics.append(siteList.get(j).siteInfo.uri + ",");
+                        if (i == count - 1 && j == siteList.size() - 1) {
+                            childSubPics.append(siteList.get(j).siteInfo.uri);
+                        } else {
+                            childSubPics.append(siteList.get(j).siteInfo.uri + ",");
+                        }
                     }
+                    subPics.append(childSubPics + "%20");
                 }
 
-                if (TextUtils.isEmpty(subPics.toString())) {
+                Logger.i(subPics.toString().trim());
+
+                if (TextUtils.isEmpty(subPics.toString().trim())) {
                     Toast.makeText(mContext, "请选择分屏", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 //设置分屏
                 if (falgPoll) {
-                    if (TextUtils.isEmpty(pollTime)) {
+                    if (TextUtils.isEmpty(pollTime) || TextUtils.equals("0", pollTime)) {
                         Toast.makeText(mContext, "请选择轮询时间", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    splitScreen(smcConfId, "", presenceMode, subPics.toString(), pollTime);
+                    splitScreen(smcConfId, "", presenceMode, subPics.toString().trim(), pollTime);
                 } else {
-                    splitScreen(smcConfId, "", presenceMode, subPics.toString(), null);
+                    splitScreen(smcConfId, "", presenceMode, subPics.toString().trim(), "0");
                 }
                 break;
 
@@ -550,19 +549,19 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         detailViewList.clear();
         switch (currentIndex) {
             case 1:
-                presenceMode = "CP_1_1";
+                presenceMode = "1";
                 set1_1();
                 break;
 
             case 2:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_2_1";
+                        presenceMode = "2";
                         set2_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_2_2";
+                        presenceMode = "3";
                         set2_2();
                         break;
                 }
@@ -571,27 +570,27 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 3:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_3_1";
+                        presenceMode = "5";
                         set3_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_3_2";
+                        presenceMode = "6";
                         set3_2();
                         break;
 
                     case 2:
-                        presenceMode = "CP_3_3";
+                        presenceMode = "7";
                         set3_3();
                         break;
 
                     case 3:
-                        presenceMode = "CP_3_4";
+                        presenceMode = "8";
                         set3_4();
                         break;
 
                     case 4:
-                        presenceMode = "CP_3_5";
+                        presenceMode = "10";
                         set3_5();
                         break;
                 }
@@ -600,27 +599,27 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 4:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_4_1";
+                        presenceMode = "11";
                         set4_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_4_2";
+                        presenceMode = "12";
                         set4_2();
                         break;
 
                     case 2:
-                        presenceMode = "CP_4_3";
+                        presenceMode = "13";
                         set4_3();
                         break;
 
                     case 3:
-                        presenceMode = "CP_4_4";
+                        presenceMode = "14";
                         set4_4();
                         break;
 
                     case 4:
-                        presenceMode = "CP_4_5";
+                        presenceMode = "15";
                         set4_5();
                         break;
                 }
@@ -629,22 +628,22 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 5:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_5_1";
+                        presenceMode = "17";
                         set5_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_5_2";
+                        presenceMode = "18";
                         set5_2();
                         break;
 
                     case 2:
-                        presenceMode = "CP_5_3";
+                        presenceMode = "19";
                         set5_3();
                         break;
 
                     case 3:
-                        presenceMode = "CP_5_4";
+                        presenceMode = "20";
                         set5_4();
                         break;
                 }
@@ -653,27 +652,27 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 6:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_6_1";
+                        presenceMode = "21";
                         set6_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_6_2";
+                        presenceMode = "22";
                         set6_2();
                         break;
 
                     case 2:
-                        presenceMode = "CP_6_3";
+                        presenceMode = "23";
                         set6_3();
                         break;
 
                     case 3:
-                        presenceMode = "CP_6_4";
+                        presenceMode = "24";
                         set6_4();
                         break;
 
                     case 4:
-                        presenceMode = "CP_6_5";
+                        presenceMode = "25";
                         set6_5();
                         break;
                 }
@@ -682,22 +681,22 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 7:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_7_1";
+                        presenceMode = "26";
                         set7_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_7_2";
+                        presenceMode = "27";
                         set7_2();
                         break;
 
                     case 2:
-                        presenceMode = "CP_7_3";
+                        presenceMode = "28";
                         set7_3();
                         break;
 
                     case 3:
-                        presenceMode = "CP_7_4";
+                        presenceMode = "29";
                         set7_4();
                         break;
                 }
@@ -706,54 +705,54 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 8:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_8_1";
+                        presenceMode = "31";
                         set8_1();
                         break;
 
                     case 1:
-                        presenceMode = "CP_8_2";
+                        presenceMode = "32";
                         set8_2();
                         break;
                     case 2:
-                        presenceMode = "CP_8_3";
+                        presenceMode = "33";
                         set8_3();
                         break;
                     case 3:
-                        presenceMode = "CP_8_4";
+                        presenceMode = "34";
                         set8_4();
                         break;
                 }
                 break;
 
             case 9:
-                presenceMode = "CP_9_1";
+                presenceMode = "35";
                 set9_1();
                 break;
 
             case 10:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_10_1";
+                        presenceMode = "36";
                         set10_1();
                         break;
                     case 1:
-                        presenceMode = "CP_10_2";
+                        presenceMode = "37";
                         set10_2();
                         break;
                     case 2:
-                        presenceMode = "CP_10_3";
+                        presenceMode = "38";
                         set10_3();
                         break;
                     case 3:
-                        presenceMode = "CP_10_4";
+                        presenceMode = "39";
                         set10_4();
                         break;
                     case 4:
-                        presenceMode = "CP_10_5";
+                        presenceMode = "40";
                         set10_5();
                         break;
                     case 5:
-                        presenceMode = "CP_10_6";
+                        presenceMode = "41";
                         set10_6();
                         break;
                 }
@@ -762,40 +761,40 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             case 13:
                 switch (currentChlidIndex) {
                     case 0:
-                        presenceMode = "CP_13_1";
+                        presenceMode = "42";
                         set13_1();
                         break;
                     case 1:
-                        presenceMode = "CP_13_2";
+                        presenceMode = "43";
                         set13_2();
                         break;
                     case 2:
-                        presenceMode = "CP_13_3";
+                        presenceMode = "44";
                         set13_3();
                         break;
                     case 3:
-                        presenceMode = "CP_13_4";
+                        presenceMode = "45";
                         set13_4();
                         break;
                     case 4:
-                        presenceMode = "CP_13_5";
+                        presenceMode = "46";
                         set13_5();
                         break;
                 }
                 break;
 
             case 16:
-                presenceMode = "CP_16_1";
+                presenceMode = "47";
                 set16_1();
                 break;
 
             case 20:
-                presenceMode = "CP_20_1";
+                presenceMode = "48";
                 set20_1();
                 break;
 
             case 24:
-                presenceMode = "CP_24_1";
+                presenceMode = "49";
                 set24_1();
                 break;
         }

@@ -294,6 +294,7 @@ public class ConfControlFragment extends BaseFragment {
                             @Override
                             public void onSuccess(String s) {
                                 try {
+                                    Logger.i(s);
                                     if (TextUtils.isEmpty(s)) {
                                         Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
                                         return;

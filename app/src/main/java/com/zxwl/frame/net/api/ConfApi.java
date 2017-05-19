@@ -318,7 +318,7 @@ public interface ConfApi {
      * @return
      */
     @GET(Urls.SPLIT_SCREEN)
-    Observable<String> setSplitScreen(@Query("confId") String confId,
+    Observable<String> setSplitScreen(@Query("smcConfId") String confId,
                                       @Query("target") String target,
                                       @Query("presenceMode") String presenceMode,
                                       @Query("subPics") String subPics,

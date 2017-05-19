@@ -128,10 +128,6 @@ public class AssemblyRoomControlFragment extends BaseFragment {
         getConfInfo();
     }
 
-    @Override
-    protected void addListeners() {
-    }
-
     /**
      * 设置控件的事件
      */
@@ -208,6 +204,10 @@ public class AssemblyRoomControlFragment extends BaseFragment {
         refresh.setEnableRefresh(false);
         //设置上拉加载不可用
         refresh.setEnableLoadmore(false);
+    }
+
+    @Override
+    protected void addListeners() {
     }
 
     /**
