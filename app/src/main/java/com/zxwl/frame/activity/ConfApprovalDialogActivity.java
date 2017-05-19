@@ -25,6 +25,7 @@ import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.net.transformer.ListDefaultTransformer;
 import com.zxwl.frame.rx.RxBus;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -175,45 +176,49 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
      */
     private void passRequest() {
         String vetos = etOpinion.getText().toString();
-        HttpUtils.getInstance(this)
-                .getRetofitClinet()
-                .builder(ConfApi.class)
-                .approveEntity(
-                        contactList,
-                        confBean.confParameters,
-                        confBean.name,
-                        confBean.schedulingTime,
-                        confBean.endTime,
-                        confBean.duration,
-                        confBean.isEmail,
-                        confBean.isSms,
-                        confBean.smsId,
-                        confBean.smsTitle,
-                        confBean.smsContext,
-                        confBean.contactPeople,
-                        confBean.contactTelephone,
-                        confBean.peopleIdOa,
-                        confBean.id,
-                        vetos)
-                .compose(this.<String>bindToLifecycle())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        new RxSubscriber<String>() {
-                            @Override
-                            public void onSuccess(String s) {
-                                RxBus.getInstance().post(0);
-                                Toast.makeText(ConfApprovalDialogActivity.this, "会议通过", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
+        try {
+            HttpUtils.getInstance(this)
+                    .getRetofitClinet()
+                    .builder(ConfApi.class)
+                    .approveEntity(
+                            contactList,
+                            confBean.confParameters,
+                            confBean.name,
+                            confBean.schedulingTime,
+                            confBean.endTime,
+                            confBean.duration,
+                            confBean.isEmail,
+                            confBean.isSms,
+                            confBean.smsId,
+                            new String(confBean.smsTitle.getBytes(), "UTF-8"),
+                            confBean.smsContext,
+                            confBean.contactPeople,
+                            confBean.contactTelephone,
+                            confBean.peopleIdOa,
+                            confBean.id,
+                            vetos)
+                    .compose(this.<String>bindToLifecycle())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            new RxSubscriber<String>() {
+                                @Override
+                                public void onSuccess(String s) {
+                                    RxBus.getInstance().post(0);
+                                    Toast.makeText(ConfApprovalDialogActivity.this, "会议通过", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
 
-                            @Override
-                            protected void onError(ResponeThrowable responeThrowable) {
-                                Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
-                                finish();
+                                @Override
+                                protected void onError(ResponeThrowable responeThrowable) {
+                                    Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
                             }
-                        }
-                );
+                    );
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

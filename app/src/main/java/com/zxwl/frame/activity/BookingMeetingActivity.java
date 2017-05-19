@@ -346,7 +346,7 @@ public class BookingMeetingActivity extends BaseActivity implements View.OnClick
                 .build();
 
         //设置对话框的宽度
-        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth(this) * 2 / 3, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() * 2 / 3, ViewGroup.LayoutParams.WRAP_CONTENT);
         //点击对话框以外的地方，对话框不消失
         //dialog.setCanceledOnTouchOutside(false);
         //点击对话框意外的地方和返回键，对话框都不消失

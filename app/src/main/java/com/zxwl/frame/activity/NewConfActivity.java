@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +22,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.dinuscxj.itemdecoration.GridOffsetsItemDecoration;
 import com.jzxiang.pickerview.TimePickerDialog;
 import com.jzxiang.pickerview.data.Type;
+import com.jzxiang.pickerview.listener.OnDateSetListener;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
 import com.lcodecore.tkrefreshlayout.header.progresslayout.ProgressLayout;
@@ -148,7 +150,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     private String showSMSContent;//显示的短信内容
     private String smsContent;//短信内容
     private String smsTitle;//短信主题
-    private RichEditor etSMScontent;
+    private RichEditor etDialogSMScontent;
     /*短信列表模板适配器--end*/
 
     private String contactList;//参会的单位号和人员号_TN_C1,_TN_C6727,_TN_C6516,-3829,3828,3785,3784,
@@ -224,6 +226,14 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         tvHome.setVisibility(View.VISIBLE);
         tvName.setVisibility(View.VISIBLE);
         tvName.setText(UserHelper.getSavedUser().name);
+
+        reSMSContent.setEnabled(false);
+        reSMSContent.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return false;
+            }
+        });
 
         //获得高级参数Id
         getConfParametersList();
@@ -411,7 +421,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     return;
                 }
 
-                if (11!=phone.toString().trim().length()) {
+                if (11 != phone.toString().trim().length()) {
                     Toast.makeText(this, "联系人电话格式不正确", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -455,27 +465,27 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //会议名称
             case R.id.tv_conf_name:
-                etSMScontent.insertImage("file:///android_asset/icon_hymc.png", "");
+                etDialogSMScontent.insertImage("file:///android_asset/icon_hymc.png", "");
                 break;
 
             //收件人
             case R.id.tv_consignee:
-                etSMScontent.insertImage("file:///android_asset/icon_sjr.png", "");
+                etDialogSMScontent.insertImage("file:///android_asset/icon_sjr.png", "");
                 break;
 
             //会议号码
             case R.id.tv_conf_number:
-                etSMScontent.insertImage("file:///android_asset/icon_hyhm.png", "");
+                etDialogSMScontent.insertImage("file:///android_asset/icon_hyhm.png", "");
                 break;
 
             //会议时间
             case R.id.tv_dialog_time:
-                etSMScontent.insertImage("file:///android_asset/icon_hysj.png", "");
+                etDialogSMScontent.insertImage("file:///android_asset/icon_hysj.png", "");
                 break;
 
             //会场名称
             case R.id.tv_site_name:
-                etSMScontent.insertImage("file:///android_asset/icon_hcmc.png", "");
+                etDialogSMScontent.insertImage("file:///android_asset/icon_hcmc.png", "");
                 break;
 
             default:
@@ -634,7 +644,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         TextView tvConfNumber = (TextView) dialogView.findViewById(R.id.tv_conf_number);//会议号码
                         TextView tvConfTime = (TextView) dialogView.findViewById(R.id.tv_dialog_time);//会议时间
                         TextView tvSiteName = (TextView) dialogView.findViewById(R.id.tv_site_name);//会场名称
-                        etSMScontent = (RichEditor) dialogView.findViewById(R.id.et_content);
+                        etDialogSMScontent = (RichEditor) dialogView.findViewById(R.id.et_content);
 
                         tvConfName.setOnClickListener(NewConfActivity.this);
                         tvConsignee.setOnClickListener(NewConfActivity.this);
@@ -648,7 +658,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                 if (position == 0) {
                                     etTheme.setText("");
-                                    etSMScontent.setHtml("");
+                                    etDialogSMScontent.setHtml("");
                                     return;
                                 }
 
@@ -658,7 +668,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
                                 etTheme.setText(smsBean.name);
                                 showSMSContent = dialogTextToHtml(smsBean.context);
-                                etSMScontent.setHtml(showSMSContent);
+                                etDialogSMScontent.setHtml(showSMSContent);
                             }
 
                             @Override
@@ -675,16 +685,17 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                                 .onPositive(
                                         (dialogDialog, which) -> {
                                             //获得短信内容
-                                            smsContent = htmlToText(etSMScontent.getHtml());
+                                            smsContent = htmlToText(etDialogSMScontent.getHtml());
                                             //获得短信主题
                                             smsTitle = etTheme.getText().toString();
                                             //设置主界面短信内容的显示
-                                            reSMSContent.setHtml(showSMSContent);
+                                            reSMSContent.setHtml("");
+                                            reSMSContent.setHtml(etDialogSMScontent.getHtml());
                                         }
                                 )
                                 .build();
                         //设置对话框的宽度
-                        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth(NewConfActivity.this) / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
                         //点击对话框以外的地方，对话框不消失
                         //dialog.setCanceledOnTouchOutside(false);
                         //点击对话框意外的地方和返回键，对话框都不消失
@@ -1035,7 +1046,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 .customView(dialogView, false)
                 .build();
         //设置对话框的宽度
-        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth(this) * 2 / 3, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() * 2 / 3, ViewGroup.LayoutParams.WRAP_CONTENT);
         //点击对话框以外的地方，对话框不消失
         dialog.setCanceledOnTouchOutside(false);
         //点击对话框意外的地方和返回键，对话框都不消失
@@ -1096,12 +1107,14 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
      */
     private void showStartTimeDialog() {
         startTimeDialog = new TimePickerDialog.Builder()
-                .setCallBack((timePickerView, millseconds) -> {
-                            startTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
-                            startTimeLong = millseconds;
-                            showEndTimeDialog();
-                        }
-                )
+                .setCallBack(new OnDateSetListener() {
+                    @Override
+                    public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
+                        startTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
+                        startTimeLong = millseconds;
+                        showEndTimeDialog();
+                    }
+                })
                 .setCancelStringId("Cancel")
                 .setSureStringId("Sure")
                 .setYearText("年")
@@ -1128,15 +1141,17 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
      */
     private void showEndTimeDialog() {
         endTimeDialog = new TimePickerDialog.Builder()
-                .setCallBack(
-                        (timePickerView, millseconds) -> {
-                            endTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
-                            endTimeLong = millseconds;
-                            long minute = (endTimeLong - startTimeLong) / 1000 / 60;
-                            tvConfTime.setText(startTime);
-                            tvDuration.setText("预计" + endTime + "结束会议,时长" + minute + "分钟");
+                .setCallBack(new OnDateSetListener() {
+                    @Override
+                    public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
+                        endTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
+                        endTimeLong = millseconds;
+                        long minute = (endTimeLong - startTimeLong) / 1000 / 60;
+                        tvConfTime.setText(startTime);
+                        tvDuration.setText("预计" + endTime + "结束会议,时长" + minute + "分钟");
 
-                        })
+                    }
+                })
                 .setCancelStringId("Cancel")
                 .setSureStringId("Sure")
                 .setYearText("年")
@@ -1175,6 +1190,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
             tvDuration.setText("");//会议时长
             etEmail.setText("");//邮件内容
             reSMSContent.setHtml("");//短信内容
+            expAdapter.remove();
             return;
         }
         //短信标题

@@ -20,4 +20,5 @@ public class SiteInfo {
     public String uri;//会场标识。
     public String videoFormat;//视频格式
     public String videoProtocol;//视频协议
+
 }

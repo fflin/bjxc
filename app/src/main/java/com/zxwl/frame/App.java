@@ -1,6 +1,8 @@
 package com.zxwl.frame;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 
 import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -43,7 +45,44 @@ public class App extends Application {
 
         //腾讯bug线上搜集工具
         CrashReport.initCrashReport(getApplicationContext(), "568d7ac2da", false);
+
+        registerActivityLifecycleCallbacks(callbacks);
     }
+    ActivityLifecycleCallbacks callbacks = new ActivityLifecycleCallbacks() {
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            Class<? extends Activity> aClass = activity.getClass();
+        }
 
 
+        @Override
+        public void onActivityStarted(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+
+        }
+    };
 }

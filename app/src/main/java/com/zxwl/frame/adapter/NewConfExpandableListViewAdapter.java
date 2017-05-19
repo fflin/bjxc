@@ -40,6 +40,17 @@ public class NewConfExpandableListViewAdapter extends BaseExpandableListAdapter 
         return mMaps.values().iterator();
     }
 
+    public void remove() {
+        if (null != orgNames) {
+            orgNames.clear();
+        }
+
+        if (null != mMaps) {
+            mMaps.clear();
+        }
+        notifyDataSetChanged();
+    }
+
     //        获取分组的个数
     @Override
     public int getGroupCount() {

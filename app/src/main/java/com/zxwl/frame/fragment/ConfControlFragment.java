@@ -310,8 +310,7 @@ public class ConfControlFragment extends BaseFragment {
 
                                     //参会的会场列表
                                     String s3 = array.getString(2);
-                                    siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {
-                                    }.getType());
+                                    siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {}.getType());
 
                                     //设置bean的操作状态
                                     for (int i = 0, count = siteList.size(); i < count; i++) {
