@@ -83,7 +83,10 @@ public class ConfBean implements Serializable {
     public String deviceNumber;//设备数量
     public String deviceName;//设备名称
     public boolean select;//复选框是否选中
-    public boolean showControl;//是否显示控制界面
+    public boolean showControl = false;//是否显示控制界面
+
+    public boolean isVegetarian;//收缩
+
 //    public String select;//复选框是否选中
 
 //    // Fields

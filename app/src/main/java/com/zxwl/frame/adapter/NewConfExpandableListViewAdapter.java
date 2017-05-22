@@ -21,7 +21,6 @@ import java.util.Map;
 /**
  * Created by asus-pc on 2017/5/7.
  */
-
 public class NewConfExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     private Context context;
@@ -177,12 +176,11 @@ public class NewConfExpandableListViewAdapter extends BaseExpandableListAdapter 
         return convertView;
     }
 
-    //        指定位置上的子元素是否可选中
+    //指定位置上的子元素是否可选中
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
-
 
     static class GroupViewHolder {
         TextView tvTitle;
@@ -194,5 +192,4 @@ public class NewConfExpandableListViewAdapter extends BaseExpandableListAdapter 
         RelativeLayout rl;
         ImageView iv;
     }
-
 }

@@ -150,4 +150,5 @@ dependencies {
     //通用的适配器
     compile 'com.zhy:base-rvadapter:3.0.3'//
     testCompile 'junit:junit:4.12'//
+    compile 'com.bignerdranch.android:expandablerecyclerview:3.0.0-RC1'
 }

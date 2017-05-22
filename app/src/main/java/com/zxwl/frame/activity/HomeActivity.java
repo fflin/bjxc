@@ -88,7 +88,8 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
             //会议控制
             case R.id.tv_conf_control:
-                ConfControlListActivity.startActivity(this);
+//                ConfControlListActivity.startActivity(this);
+                ExpandableConfControlListActivity.startActivity(this);
                 break;
 
             case R.id.tv_template_manage:

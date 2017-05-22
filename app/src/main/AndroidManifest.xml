@@ -85,6 +85,13 @@
             android:name=".activity.ConfControlListActivity"
             android:screenOrientation="landscape">
         </activity>
+
+        <!-- 可以收缩的会议控制列表 -->
+        <activity
+            android:name=".activity.ExpandableConfControlListActivity"
+            android:screenOrientation="landscape">
+        </activity>
+
         <!-- 会议控制界面 -->
         <activity
             android:name=".activity.ConfControlActivity"
