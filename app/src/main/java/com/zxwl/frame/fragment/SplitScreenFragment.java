@@ -361,7 +361,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     public void splitScreen(String smcConfId,
                             String target,
                             String presenceMode,
-                            String subPics,
+                            String[] subPics,
                             String splitScreenTime) {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
@@ -397,6 +397,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             //保存
             case R.id.tv_save:
                 StringBuilder subPics = new StringBuilder();
+                String[] subs = new String[detailViewList.size()];
                 for (int i = 0, count = detailViewList.size(); i < count; i++) {
                     StringBuilder childSubPics = new StringBuilder();
                     DetailView detail = detailViewList.get(i);
@@ -404,18 +405,18 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                     SplitScreenItemAdapter adapter = (SplitScreenItemAdapter) recycler.getAdapter();
                     List<Site> siteList = adapter.getSiteList();
                     for (int j = 0; j < siteList.size(); j++) {
-                        if (i == count - 1 && j == siteList.size() - 1) {
+                        if (j == siteList.size() - 1) {
                             childSubPics.append(siteList.get(j).siteInfo.uri);
                         } else {
                             childSubPics.append(siteList.get(j).siteInfo.uri + ",");
                         }
                     }
-                    subPics.append(childSubPics + "%20");
+                    subs[i] = childSubPics.toString();
                 }
 
                 Logger.i(subPics.toString().trim());
 
-                if (TextUtils.isEmpty(subPics.toString().trim())) {
+                if (!(subs.length > 0)) {
                     Toast.makeText(mContext, "请选择分屏", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -426,9 +427,9 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                         Toast.makeText(mContext, "请选择轮询时间", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    splitScreen(smcConfId, "", presenceMode, subPics.toString().trim(), pollTime);
+                    splitScreen(smcConfId, "", presenceMode, subs, pollTime);
                 } else {
-                    splitScreen(smcConfId, "", presenceMode, subPics.toString().trim(), "0");
+                    splitScreen(smcConfId, "", presenceMode, subs, "0");
                 }
                 break;
 

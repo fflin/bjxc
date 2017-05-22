@@ -100,7 +100,6 @@ public class ConfControlListActivity extends BaseActivity {
             @Override
             public void onFinish(int position) {
                 setAdapterShow(position);
-
                 ConfBean confBean = list.get(position);
                 //结束会议的网络请求
                 finishConfRequest(confBean.id, confBean.smcConfId, position);

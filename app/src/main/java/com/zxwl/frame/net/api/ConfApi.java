@@ -321,7 +321,7 @@ public interface ConfApi {
     Observable<String> setSplitScreen(@Query("smcConfId") String confId,
                                       @Query("target") String target,
                                       @Query("presenceMode") String presenceMode,
-                                      @Query("subPics") String subPics,
+                                      @Query("subPics") String[]  subPics,
                                       @Query("splitScreenTime") String splitScreenTime);
 
     /**
