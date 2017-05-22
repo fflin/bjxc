@@ -769,13 +769,13 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 .flatMap(new Func1<String, Observable<DataList<DepartBean>>>() {
                     @Override
                     public Observable<DataList<DepartBean>> call(String s) {
-                        //设置参会的单位和人员号
+                        //设置参会的单位和人员号  _TN_C1,-3946,3945,
                         contactList = s;
                         return HttpUtils//
                                 .getInstance(NewConfActivity.this)
                                 .getRetofitClinet()
                                 .builder(ConfApi.class)
-                                .getPeopleList(s);
+                                .getPeopleList(contactList);
                     }
                 })
                 .compose(this.<DataList<DepartBean>>bindToLifecycle())
@@ -785,7 +785,6 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     public void onSuccess(List<DepartBean> departments) {
                         //设置参会人员列表
                         setJoinList(departments);
-
                         //根据bean设置控件内容
                         setConfContent(currentHistoryConfBean);
                     }
@@ -795,68 +794,6 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         Toast.makeText(NewConfActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    /**
-     * 设置参会列表
-     *
-     * @param departments 参会人员
-     */
-    private void setJoinList(List<DepartBean> departments) {
-        // 根据得到的参会人员列表departments设置右边的数据
-
-        //单位和单位人员的map
-        HashMap<String, List<Employee>> maps = new HashMap<>();
-        //使用单位的名称
-        List<String> org1Names = new ArrayList<>();
-        hisEmployee.clear();
-        for (int i = 0; i < departments.size(); i++) {
-            String[] strName = departments.get(i).getEmployeeName().split(",");
-            String[] strId = departments.get(i).getEmployeeId().split(",");
-            String orgName = departments.get(i).getDeptName();
-            for (int j = 0; j < strName.length; j++) {
-                Employee employee = new Employee();
-                employee.setName(strName[j]);
-                employee.setId(strId[j]);
-                employee.setOrgName(orgName);
-                hisEmployee.add(employee);
-            }
-        }
-        maps.clear();
-        org1Names.clear();
-        for (int i = 0; i < hisEmployee.size(); i++) {
-            //EmployeeBean bean = new EmployeeBean();
-            String orgName = hisEmployee.get(i).getOrgName();
-            String name = hisEmployee.get(i).getName();
-            Employee employee = hisEmployee.get(i);
-
-            List<Employee> list = maps.get(orgName);
-
-            if (list == null) {
-                list = new ArrayList<>();
-            }
-
-            if (!list.contains(employee)) {
-                list.add(employee);
-            }
-            if (!maps.containsKey(orgName)) {
-                maps.put(orgName, list);
-            }
-
-        }
-
-        Set<String> set = maps.keySet();
-        Iterator<String> iterator = set.iterator();
-        for (int i = 0; i < maps.size(); i++) {
-            String key = iterator.next();
-            if (!org1Names.contains(key)) {
-                org1Names.add(key);
-            }
-            List<Employee> values = maps.get(key);
-        }
-        expAdapter = new NewConfExpandableListViewAdapter(NewConfActivity.this, org1Names, maps);
-        exLv.setAdapter(expAdapter);
-        expAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -1174,6 +1111,67 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     }
 
     /**
+     * 设置参会列表
+     *
+     * @param departments 参会人员
+     */
+    private void setJoinList(List<DepartBean> departments) {
+        // 根据得到的参会人员列表departments设置右边的数据
+        //单位和单位人员的map
+        HashMap<String, List<Employee>> maps = new HashMap<>();
+        //使用单位的名称
+        List<String> org1Names = new ArrayList<>();
+        hisEmployee.clear();
+        for (int i = 0; i < departments.size(); i++) {
+            String[] strName = departments.get(i).getEmployeeName().split(",");
+            String[] strId = departments.get(i).getEmployeeId().split(",");
+            String orgName = departments.get(i).getDeptName();
+            for (int j = 0; j < strName.length; j++) {
+                Employee employee = new Employee();
+                employee.setName(strName[j]);
+                employee.setId(strId[j]);
+                employee.setOrgName(orgName);
+                hisEmployee.add(employee);
+            }
+        }
+        maps.clear();
+        org1Names.clear();
+        for (int i = 0; i < hisEmployee.size(); i++) {
+            //EmployeeBean bean = new EmployeeBean();
+            String orgName = hisEmployee.get(i).getOrgName();
+            String name = hisEmployee.get(i).getName();
+            Employee employee = hisEmployee.get(i);
+
+            List<Employee> list = maps.get(orgName);
+
+            if (list == null) {
+                list = new ArrayList<>();
+            }
+
+            if (!list.contains(employee)) {
+                list.add(employee);
+            }
+            if (!maps.containsKey(orgName)) {
+                maps.put(orgName, list);
+            }
+
+        }
+
+        Set<String> set = maps.keySet();
+        Iterator<String> iterator = set.iterator();
+        for (int i = 0; i < maps.size(); i++) {
+            String key = iterator.next();
+            if (!org1Names.contains(key)) {
+                org1Names.add(key);
+            }
+            List<Employee> values = maps.get(key);
+        }
+        expAdapter = new NewConfExpandableListViewAdapter(NewConfActivity.this, org1Names, maps);
+        exLv.setAdapter(expAdapter);
+        expAdapter.notifyDataSetChanged();
+    }
+
+    /**
      * 通过历史会议的bean或会议模板的bean设置内容,如果confBean为空代表重置
      *
      * @param confBean
@@ -1193,14 +1191,9 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
             expAdapter.remove();
             return;
         }
-        //短信标题
-        smsTitle = confBean.smsTitle;
-        //短信id
-        smsId = confBean.smsId;
-        //短信内容
-        smsContent = confBean.smsContext;
-
-        // 根据confBean填写会议的信息
+        smsTitle = confBean.smsTitle; //短信标题
+        smsId = confBean.smsId;//短信id
+        smsContent = confBean.smsContext;  //短信内容
         etName.setText(confBean.name);//会议名称
         reSMSContent.setHtml(textToHtml(smsContent));//短信内容
     }
@@ -1210,7 +1203,6 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     public void onConfirmEvent(ConfirmEvent event) {
         //当选中联系人的时候把通过历史会议选中的人员列表至为空
         contactList = null;
-
         List<Employee> employeesData = event.data;
         int allSize = event.size;
         if (employeesData.size() != allSize) {
@@ -1237,6 +1229,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     mMaps.put(orgName, list);
                 }
             }
+
             Set<String> set = mMaps.keySet();
             Iterator<String> iterator = set.iterator();
             for (int i = 0; i < mMaps.size(); i++) {

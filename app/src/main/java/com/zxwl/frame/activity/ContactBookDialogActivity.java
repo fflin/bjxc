@@ -37,6 +37,7 @@ import com.zxwl.frame.bean.Department;
 import com.zxwl.frame.bean.Employee;
 import com.zxwl.frame.bean.SelectEvent;
 import com.zxwl.frame.net.Urls;
+import com.zxwl.frame.rx.RxBus;
 import com.zxwl.frame.views.treeListView.bean.Node;
 import com.zxwl.frame.views.treeListView.bean.TreeHelper;
 import com.zxwl.frame.views.treeListView.bean.TreeListViewAdapter;
@@ -56,6 +57,9 @@ import java.util.List;
 
 import okhttp3.Call;
 
+/**
+ * 选择地址
+ */
 public class ContactBookDialogActivity extends Activity implements View.OnClickListener {
     private List<Department> mDatas3 = new ArrayList<Department>();
     //private List<Department> mDatas4 = new ArrayList<Department>();
@@ -229,7 +233,6 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
             mAdapter.setOnTreeNodeClickListener(new TreeListViewAdapter.OnTreeNodeClickListener() {
                 @Override
                 public void onClick(Node node, int position) {
-
                     //itemDepartment.clear();
 //                    String orgNo = mDatas3.get(position).getId();
 //                    Log.i("TAG", "name===" + mDatas3.get(position).getDepartmentName() + "," + "orgNo====" + orgNo + "," + position);
@@ -274,9 +277,7 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                     public void onResponse(String response, int id) {
                         try {
                             JSONArray array = new JSONArray(response.toString());
-
                             for (int i = 0; i < array.length(); i++) {
-
                                 JSONObject item = array.getJSONObject(i);
                                 Department department = new Department(item.getString("id"), item.getString("parentId"), item.getString("departmentName"));
                                 department.setId(item.getString("id"));
@@ -525,14 +526,13 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                //Toast.makeText(ContactBookDialogActivity.this, "11", Toast.LENGTH_SHORT).show();
                                 eventBus.post(new ConfirmEvent(confirmEmployee, allEmployee.size()));
+                                RxBus.getInstance().post(new ConfirmEvent(confirmEmployee, allEmployee.size()));
                                 finish();
                             }
                         })
                         .build();
                 dialog.show();
-
                 break;
             case R.id.btn_clear://清空
                 selectedDepartment.clear();
@@ -601,8 +601,6 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                 return false;
             }
         });
-
-
         return dialogView;
     }
 }

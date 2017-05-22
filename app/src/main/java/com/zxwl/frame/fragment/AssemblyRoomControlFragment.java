@@ -21,9 +21,11 @@ import com.zxwl.frame.activity.ConfControlActivity;
 import com.zxwl.frame.adapter.ConfControlGridAdapter;
 import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
+import com.zxwl.frame.bean.ConfirmEvent;
 import com.zxwl.frame.bean.Site;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.http.HttpUtils;
+import com.zxwl.frame.rx.RxBus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.ielse.view.SwitchView;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -64,6 +68,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
     private List<Site> siteList = new ArrayList<>();
 
     private int currentIndex;//当前选中的下标
+    private Subscription subscribe;
 
     public AssemblyRoomControlFragment() {
     }
@@ -126,6 +131,31 @@ public class AssemblyRoomControlFragment extends BaseFragment {
 
         //获得会议信息
         getConfInfo();
+
+        initRxBus();
+    }
+
+    private void initRxBus() {
+        subscribe = RxBus.getInstance()
+                .toObserverable(ConfirmEvent.class)
+                .compose(this.<ConfirmEvent>bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<ConfirmEvent>() {
+                            @Override
+                            public void call(ConfirmEvent confirmEvent) {
+                                Toast.makeText(mContext, "会场控制选择了"+confirmEvent.size, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (null != subscribe) {
+            subscribe.unsubscribe();
+        }
     }
 
     /**

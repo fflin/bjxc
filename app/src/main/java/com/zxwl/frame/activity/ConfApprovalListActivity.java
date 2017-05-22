@@ -105,7 +105,6 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
         initRxBus();
         //开始刷新
         refreshLayout.startRefresh();
-
     }
 
     private void initRxBus() {
@@ -120,7 +119,6 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
                         }
                 );
     }
-
 
     /**
      * 初始化recyclerview

@@ -23,11 +23,13 @@ import com.zxwl.frame.activity.ConfControlActivity;
 import com.zxwl.frame.adapter.ConfControlGridAdapter;
 import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
+import com.zxwl.frame.bean.ConfirmEvent;
 import com.zxwl.frame.bean.Site;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
 import com.zxwl.frame.net.exception.ResponeThrowable;
 import com.zxwl.frame.net.http.HttpUtils;
+import com.zxwl.frame.rx.RxBus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,7 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.ielse.view.SwitchView;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import static com.zxwl.frame.R.id.refresh;
@@ -83,6 +87,7 @@ public class ConfControlFragment extends BaseFragment {
 
     private int chairIndex = -1;//主席会场的下标
     private int broadcastIndex = -1;//广播会场的下标
+    private Subscription subscribe;
 
     public ConfControlFragment() {
     }
@@ -163,6 +168,9 @@ public class ConfControlFragment extends BaseFragment {
 
         //获得会议信息
         getConfInfo();
+
+
+        initRxBus();
     }
 
     @Override
@@ -311,7 +319,8 @@ public class ConfControlFragment extends BaseFragment {
 
                                     //参会的会场列表
                                     String s3 = array.getString(2);
-                                    siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {}.getType());
+                                    siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {
+                                    }.getType());
 
                                     //设置bean的操作状态
                                     for (int i = 0, count = siteList.size(); i < count; i++) {
@@ -346,10 +355,33 @@ public class ConfControlFragment extends BaseFragment {
                             @Override
                             protected void onError(ResponeThrowable responeThrowable) {
                                 Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
-
                             }
                         }
                 );
+    }
+
+    private void initRxBus() {
+        subscribe = RxBus.getInstance()
+                .toObserverable(ConfirmEvent.class)
+                .compose(this.<ConfirmEvent>bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<ConfirmEvent>() {
+                            @Override
+                            public void call(ConfirmEvent confirmEvent) {
+                                Toast.makeText(mContext, "会议控制选择了" + confirmEvent.size, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (null != subscribe) {
+            subscribe.unsubscribe();
+        }
+
     }
 
     /**

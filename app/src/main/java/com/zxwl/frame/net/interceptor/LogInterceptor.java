@@ -29,7 +29,6 @@ public class LogInterceptor implements Interceptor {
         long t2 = System.nanoTime();
 //        Logger.i(String.format("Received response for %s include_common_operation %s.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
 //        Logger.i(String.format("Received response for %s include_common_operation %.1fms%n%s", response.request().url().toString(), (t2 - t1) / 1e6d, response.headers()));
-        Logger.i("NetWork", "response body:" + content);
         if (response.body() != null) {
             ResponseBody body = ResponseBody.create(mediaType, content);
             return response.newBuilder().body(body).build();

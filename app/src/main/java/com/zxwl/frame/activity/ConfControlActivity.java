@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zxwl.frame.R;
+import com.zxwl.frame.bean.ConfirmEvent;
 import com.zxwl.frame.bean.MenuBean;
 import com.zxwl.frame.fragment.AssemblyRoomControlFragment;
 import com.zxwl.frame.fragment.ConfControlFragment;
 import com.zxwl.frame.fragment.SplitScreenFragment;
+import com.zxwl.frame.rx.RxBus;
 import com.zxwl.frame.utils.DisplayUtil;
 import com.zxwl.frame.views.CustomViewPager;
 
@@ -29,6 +32,9 @@ import java.util.List;
 import q.rorbin.verticaltablayout.VerticalTabLayout;
 import q.rorbin.verticaltablayout.adapter.TabAdapter;
 import q.rorbin.verticaltablayout.widget.TabView;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 /**
  * 会议控制面板
@@ -39,13 +45,14 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
     private TextView tvHome;
     private TextView tvName;
 
-    private TextView tvPreview;
-    private TextView tvExtendConf;
-    private TextView tvFinishTime;
-    private TextView tvSetError;
-    private TextView tvFinish;
-    private TextView tvDirectory;
-    private TextView tvAddParty;
+    private TextView tvPreview;//画面预览
+    private TextView tvExtendConf;//延长会议
+    private TextView tvFinishTime;//会议结束时间
+    private TextView tvSetError;//设为异常
+    private TextView tvFinish;//结束会议
+    private TextView tvDirectory;//从地址簿添加
+    private TextView tvAddParty;//添加与会方
+
     private CustomViewPager vpContent;
     private VerticalTabLayout tablayout;
     private ImageView ivUp;
@@ -57,7 +64,9 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
     public static final String SMC_CONF_ID = "smc_conf_id";
     public static final String CONF_ID = "conf_id";
 
-    public static void startActivity(Context context, String smcConfId,String confId) {
+    private Subscription subscribe;
+
+    public static void startActivity(Context context, String smcConfId, String confId) {
         Intent intent = new Intent(context, ConfControlActivity.class);
         intent.putExtra(SMC_CONF_ID, smcConfId);
         intent.putExtra(CONF_ID, confId);
@@ -90,10 +99,9 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
         String smcConfId = getIntent().getStringExtra(SMC_CONF_ID);
         String confId = getIntent().getStringExtra(CONF_ID);
 
-        fragmentList.add(ConfControlFragment.newInstance(smcConfId,confId));
-        fragmentList.add(AssemblyRoomControlFragment.newInstance(smcConfId,confId));
-        fragmentList.add(SplitScreenFragment.newInstance(smcConfId,confId));
-//        fragmentList.add(TempFragment.newInstance());
+        fragmentList.add(ConfControlFragment.newInstance(smcConfId, confId));
+        fragmentList.add(AssemblyRoomControlFragment.newInstance(smcConfId, confId));
+        fragmentList.add(SplitScreenFragment.newInstance(smcConfId, confId));
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), fragmentList);
         vpContent.setAdapter(pagerAdapter);
         //设置缓存的数量
@@ -120,12 +128,22 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
                 tablayout.setLayoutParams(layoutParams);
             }
         });
+
+        initRxBus();
     }
 
     @Override
     protected void setListener() {
         ivUp.setOnClickListener(this);
         ivDown.setOnClickListener(this);
+
+        tvPreview.setOnClickListener(this);//画面预览
+        tvExtendConf.setOnClickListener(this);//延长会议
+        tvFinishTime.setOnClickListener(this);//会议结束时间
+        tvSetError.setOnClickListener(this);//设为异常
+        tvFinish.setOnClickListener(this);//结束会议
+        tvDirectory.setOnClickListener(this);//从地址簿添加
+        tvAddParty.setOnClickListener(this);//添加与会方
     }
 
     @Override
@@ -152,9 +170,34 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
                 }
                 vpContent.setCurrentItem(current + 1, true);
                 break;
+
+            //画面预览
+            case R.id.tv_preview:
+                break;
+
+            //从地址簿添加
+            case R.id.tv_directory:
+                ContactBookDialogActivity.startActivity(this);
+                break;
+
             default:
                 break;
         }
+    }
+
+    private void initRxBus() {
+        subscribe = RxBus.getInstance()
+                .toObserverable(ConfirmEvent.class)
+                .compose(this.<ConfirmEvent>bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<ConfirmEvent>() {
+                            @Override
+                            public void call(ConfirmEvent confirmEvent) {
+                                Log.i("Main", confirmEvent.toString());
+                            }
+                        }
+                );
     }
 
 

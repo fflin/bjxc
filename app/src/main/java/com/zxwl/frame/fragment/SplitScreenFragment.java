@@ -33,6 +33,7 @@ import com.zxwl.frame.adapter.SplitScreenItemAdapter;
 import com.zxwl.frame.adapter.SplitScreenRightAdapter;
 import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
+import com.zxwl.frame.bean.ConfirmEvent;
 import com.zxwl.frame.bean.Site;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
@@ -215,21 +216,10 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             }
         });
 
-        subscription = RxBus.getInstance()
-                .toObserverable(Intent.class)
-                .compose(this.bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Intent>() {
-                    @Override
-                    public void call(Intent intent) {
-                        int currentIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_INDEX, -1);
-                        int currentChlidIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_CHLID_INDEX, -1);
-                        showNewSplit(currentIndex, currentChlidIndex);
-                    }
-                });
-
         //获得会议信息
         getConfInfo();
+
+        initRxBus();
     }
 
     @Override
@@ -379,6 +369,27 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                     @Override
                     protected void onError(ResponeThrowable responeThrowable) {
                         Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void initRxBus() {
+        subscription = RxBus.getInstance()
+                .toObserverable(Object.class)
+                .compose(this.bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object object) {
+                        if (object instanceof Intent) {
+                            Intent intent = (Intent) object;
+                            int currentIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_INDEX, -1);
+                            int currentChlidIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_CHLID_INDEX, -1);
+                            showNewSplit(currentIndex, currentChlidIndex);
+                        } else if (object instanceof ConfirmEvent) {
+                            ConfirmEvent confirmEvent = (ConfirmEvent) object;
+                            Toast.makeText(mContext, "分屏选择了" + confirmEvent.size, Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
