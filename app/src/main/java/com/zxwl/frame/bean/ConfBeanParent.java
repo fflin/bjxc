@@ -31,14 +31,4 @@ public class ConfBeanParent implements Parent<ConfBean> {
     public ConfBean getConfBeanForPosition(int position) {
         return beanList.get(position);
     }
-
-    public boolean isVegetarian() {
-        for (ConfBean confBean : beanList) {
-            if (!confBean.isVegetarian) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 }

@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.bignerdranch.expandablerecyclerview.ChildViewHolder;
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.bignerdranch.expandablerecyclerview.ParentViewHolder;
-import com.orhanobut.logger.Logger;
 import com.zxwl.frame.R;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.ConfBeanParent;
@@ -50,7 +49,8 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
     @NonNull
     @Override
     public ParentHolder onCreateParentViewHolder(@NonNull ViewGroup parentViewGroup, int viewType) {
-        return new ParentHolder(LayoutInflater.from(parentViewGroup.getContext()).inflate(R.layout.item_expandable_head, parentViewGroup, false));
+        ParentHolder parentHolder = new ParentHolder(LayoutInflater.from(parentViewGroup.getContext()).inflate(R.layout.item_expandable_head, parentViewGroup, false));
+        return parentHolder;
     }
 
     @NonNull
@@ -62,6 +62,8 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
     @Override
     public void onBindParentViewHolder(@NonNull ParentHolder parentViewHolder, int parentPosition, @NonNull ConfBeanParent parent) {
         parentViewHolder.tvContent.setText(parent.type);
+        //当重新设置parentList的时候要调用这个方法，强制设置右边的图标转换过来
+        parentViewHolder.onExpansionToggled(true);
     }
 
     @Override
@@ -75,52 +77,52 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
             childViewHolder.rlControl.setVisibility(View.INVISIBLE);
             childViewHolder.rlInfo.setVisibility(View.VISIBLE);
         }
-        //TODO 正常使用时取消注释
-//        childViewHolder.tvName.setText(confBean.name);//会议名称
-//        childViewHolder.tvTime.setText(confBean.beginTime);
-//        childViewHolder.tvPhone.setText(confBean.contactTelephone);
-//        childViewHolder.tvPattern.setText("讨论模式");
+
+        childViewHolder.tvName.setText(confBean.name);//会议名称
+        childViewHolder.tvTime.setText(confBean.beginTime);
+        childViewHolder.tvPhone.setText(confBean.contactTelephone);
+        childViewHolder.tvPattern.setText("讨论模式");
 
 //0=周期性视频会议、1=周期性非视频会议、2=视频会议、3=非视频会议、4=即时视频会议、5=即时非视频会议、6、周期性子视频会议、7、周期性子非视频会议
-//        String confType = "周期性视频会议";
-//        switch (confBean.confType) {
-//            case "0":
-//                confType = "周期性视频会议";
-//                break;
-//
-//            case "1":
-//                confType = "周期性非视频会议";
-//                break;
-//
-//            case "2":
-//                confType = "视频会议";
-//                break;
-//
-//            case "3":
-//                confType = "非视频会议";
-//                break;
-//
-//            case "4":
-//                confType = "即时视频会议";
-//                break;
-//
-//            case "5":
-//                confType = "即时非视频会议";
-//                break;
-//
-//            case "6":
-//                confType = "周期性子视频会议";
-//                break;
-//
-//            case "7":
-//                confType = "周期性子非视频会议";
-//                break;
-//
-//            default:
-//                break;
-//        }
-//        childViewHolder.tvType.setText(confType);
+        String confType = "周期性视频会议";
+        switch (confBean.confType) {
+            case "0":
+                confType = "周期性视频会议";
+                break;
 
+            case "1":
+                confType = "周期性非视频会议";
+                break;
+
+            case "2":
+                confType = "视频会议";
+                break;
+
+            case "3":
+                confType = "非视频会议";
+                break;
+
+            case "4":
+                confType = "即时视频会议";
+                break;
+
+            case "5":
+                confType = "即时非视频会议";
+                break;
+
+            case "6":
+                confType = "周期性子视频会议";
+                break;
+
+            case "7":
+                confType = "周期性子非视频会议";
+                break;
+
+            default:
+                break;
+        }
+        childViewHolder.tvType.setText(confType);
+        //设置点击事件
         childViewHolder.rlContent.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
@@ -188,7 +190,6 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
         public void onExpansionToggled(boolean expanded) {
             super.onExpansionToggled(expanded);
 
-            Logger.i("onExpansionToggled:" + expanded);
             tvContent.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.icon_item_control_left, 0, expanded ? R.mipmap.icon_expand : R.mipmap.item_pack_up, 0);
         }
     }

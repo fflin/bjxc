@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
@@ -27,10 +28,10 @@ import com.zxwl.frame.utils.UserHelper;
 import com.zxwl.frame.views.spinner.NiceSpinner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
@@ -54,12 +55,11 @@ public class ExpandableConfControlListActivity extends BaseActivity {
     private RecyclerView rvList;
     private int PAGE_SIZE = 5;
     private int PAGE_NUM = 0;
-//    private List<ConfBean> list = new ArrayList<>();
-    /*列表刷新-end*/
-
-    //    private ConfControlAdapter adapter;
     private ExpandableConfControlAdapter adapter;
     private List<ConfBeanParent> list = new ArrayList<>();
+    /*列表刷新-end*/
+
+    private Subscription subscribe;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ExpandableConfControlListActivity.class));
@@ -91,40 +91,23 @@ public class ExpandableConfControlListActivity extends BaseActivity {
             tvName.setText(userInfo.name);
         }
 
-        //TODO 测试代码，正式时删除
-        ConfBean confBean1 = new ConfBean();
-        confBean1.showControl = false;
-
-        ConfBean confBean2 = new ConfBean();
-        confBean2.showControl = false;
-
-        ConfBean confBean3 = new ConfBean();
-        confBean3.showControl = false;
-
-        ConfBean confBean4 = new ConfBean();
-        confBean4.showControl = false;
-
-        ConfBean confBean5 = new ConfBean();
-        confBean5.showControl = false;
-
-        ConfBean confBean6 = new ConfBean();
-        confBean6.showControl = false;
-
-        ConfBean confBean7 = new ConfBean();
-        confBean7.showControl = false;
-
-        ConfBean confBean8 = new ConfBean();
-        confBean8.showControl = false;
-
-        ConfBeanParent confBeanParent1 = new ConfBeanParent("正在召开的会议", Arrays.asList(confBean1, confBean2, confBean3, confBean4));
-
-        ConfBeanParent confBeanParent2 = new ConfBeanParent("等待召开的会议", Arrays.asList(confBean5, confBean6, confBean7, confBean8));
-
-        list.add(confBeanParent1);
-        list.add(confBeanParent2);
-        //TODO 测试代码，正式时删除
-
+        //设置适配器
         adapter = new ExpandableConfControlAdapter(list);
+        adapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
+            @Override
+            public void onParentExpanded(int parentPosition) {
+            }
+
+            @Override
+            public void onParentCollapsed(int parentPosition) {
+                List<ConfBean> childList = adapter.getParentList().get(parentPosition).getChildList();
+                for (ConfBean confBean : childList) {
+                    confBean.showControl = false;
+                }
+                adapter.notifyParentChanged(parentPosition);
+            }
+        });
+
         adapter.setOnItemClickListener(new ExpandableConfControlAdapter.onItemClickListener() {
             @Override
             public void onClick(int parentPosition, int childPosition) {
@@ -153,25 +136,7 @@ public class ExpandableConfControlListActivity extends BaseActivity {
         //初始化recyclerview
         initRefresh();
         //TODO 正式使用时取消注释
-//        refreshLayout.startRefresh();
-    }
-
-    /**
-     * 设置adapter的显示
-     *
-     * @param parentPosition 在父层级的位置
-     * @param childPosition  在子层级的位置
-     */
-    private void setAdapterShow(int parentPosition, int childPosition) {
-        List<ConfBean> childList = list.get(parentPosition).getChildList();
-        for (int i = 0, count = childList.size(); i < count; i++) {
-            if (i != childPosition) {
-                childList.get(i).showControl = false;
-            }
-        }
-        ConfBean bean = childList.get(childPosition);
-        bean.showControl = !bean.showControl;
-        adapter.notifyDataSetChanged();
+        refreshLayout.startRefresh();
     }
 
     @Override
@@ -219,6 +184,32 @@ public class ExpandableConfControlListActivity extends BaseActivity {
         refreshLayout.setTargetView(rvList);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (subscribe != null && !subscribe.isUnsubscribed()) {
+            subscribe.unsubscribe();
+        }
+    }
+
+    /**
+     * 设置adapter的显示
+     *
+     * @param parentPosition 在父层级的位置
+     * @param childPosition  在子层级的位置
+     */
+    private void setAdapterShow(int parentPosition, int childPosition) {
+        List<ConfBean> childList = list.get(parentPosition).getChildList();
+        for (int i = 0, count = childList.size(); i < count; i++) {
+            if (i != childPosition) {
+                childList.get(i).showControl = false;
+            }
+        }
+        ConfBean bean = childList.get(childPosition);
+        bean.showControl = !bean.showControl;
+        adapter.notifyDataSetChanged();
+    }
+
     /**
      * 获得会议列表数据
      *
@@ -230,15 +221,16 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                 .builder(ConfApi.class);
 
         //通过压合将正在召开的会议和即将召开的会议取到
-        Observable.zip(builder.getConfApprovalList(PAGE_SIZE, pageNum),
+        subscribe = Observable.zip(
                 builder.getConfBeinglList(PAGE_SIZE, pageNum),
+                builder.getConfWaitlList(PAGE_SIZE, pageNum),
                 new Func2<DataList<ConfBean>, DataList<ConfBean>, List<ConfBeanParent>>() {
                     @Override
-                    public List<ConfBeanParent> call(DataList<ConfBean> confBeanDataList, DataList<ConfBean> confBeanDataList2) {
-                        List<ConfBeanParent> list = new ArrayList<ConfBeanParent>();
-                        list.add(new ConfBeanParent("正在召开的会议", confBeanDataList.dataList));
-                        list.add(new ConfBeanParent("即将召开的会议", confBeanDataList2.dataList));
-                        return list;
+                    public List<ConfBeanParent> call(DataList<ConfBean> beingConfList, DataList<ConfBean> waitConfList) {
+                        List<ConfBeanParent> newList = new ArrayList<ConfBeanParent>();
+                        newList.add(new ConfBeanParent("正在召开的会议(" + beingConfList.dataList.size() + ")", beingConfList.dataList));
+                        newList.add(new ConfBeanParent("预约会议(" + waitConfList.dataList.size() + ")", waitConfList.dataList));
+                        return newList;
                     }
                 })
                 .compose(this.bindToLifecycle())
@@ -247,17 +239,24 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                 .subscribe(new RxSubscriber<List<ConfBeanParent>>() {
                     @Override
                     public void onSuccess(List<ConfBeanParent> confBeanParents) {
+                        //清除之前的数据
+                        //结束刷新
+                        refreshLayout.finishRefreshing();
+                        list.clear();
+                        //刷新适配器
+                        list.addAll(confBeanParents);
 
+                        adapter.notifyParentDataSetChanged(true);
+                        Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     protected void onError(ResponeThrowable responeThrowable) {
-
+                        Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
                     }
                 });
 
-
-//        HttpUtils.getInstance(this)
+        //        HttpUtils.getInstance(this)
 //                .getRetofitClinet()
 //                .builder(ConfApi.class)
 //                .getConfBeinglList(PAGE_SIZE, pageNum)
@@ -322,7 +321,6 @@ public class ExpandableConfControlListActivity extends BaseActivity {
 //                        }
 //                );
     }
-
 
     /**
      * 结束会议

@@ -104,6 +104,14 @@ public interface ConfApi {
     Observable<DataList<ConfBean>> getConfBeinglList(@Query("pageSize") int pageSize, @Query("pageNum") int pageNum);
 
     /**
+     * 获得等待召开的会议列表
+     *
+     * @return
+     */
+    @GET(Urls.QUERY_WAIT_LIST)
+    Observable<DataList<ConfBean>> getConfWaitlList(@Query("pageSize") int pageSize, @Query("pageNum") int pageNum);
+
+    /**
      * 预约会议
      *
      * @param contactList

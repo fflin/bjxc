@@ -3,11 +3,9 @@ package com.zxwl.frame.net;
 /**
  * author：hw
  * data:2017/4/20 11:25
- * ClassName: ${Class_Name}
+ * ClassName: URL的类
  */
-
 public class Urls {
-//    public static final String BASE_URL = "http://192.168.222.137/hbsw/";
     public static final String BASE_URL = "http://192.168.0.111:8080/bjxc/";
 //    public static final String BASE_URL = "http://192.168.222.233:10119/bjxc/";
 
@@ -49,18 +47,26 @@ public class Urls {
     public static final String QUERY_HISTORY_LIST = "confAction_queryList1.action?confState=50";
 
     /**
+     * 查询正在召开的会议列表
+     * 会议状态: confState=30
+     * 0=暂存 1=取消会议  10=等待审批 15=审批超时 20=等待召开 30=正在召开 40=会议异常  50=会议结束 5=审批驳回 （原来为：0：等待召开 1：正在召开 2：召开完毕  3 ：暂存  ）
+     */
+    public static final String QUERY_BEING_LIST = "confAction_queryList1.action?confState=30";
+
+    /**
+     * 查询等待召开会议列表
+     * 会议状态: confState=50
+     * 0=暂存 1=取消会议  10=等待审批 15=审批超时 20=等待召开 30=正在召开 40=会议异常  50=会议结束 5=审批驳回 （原来为：0：等待召开 1：正在召开 2：召开完毕  3 ：暂存  ）
+     */
+    public static final String QUERY_WAIT_LIST = "confAction_queryList1.action?confState=20";
+
+    /**
      * 查询会议待审批列表
      * 会议状态: confState=10
      * 0=暂存 1=取消会议  10=等待审批 15=审批超时 20=等待召开 30=正在召开 40=会议异常  50=会议结束 5=审批驳回 （原来为：0：等待召开 1：正在召开 2：召开完毕  3 ：暂存  ）
      */
     public static final String QUERY_APPROVAL_LIST = "confAction_queryList1.action?confState=10";
 
-    /**
-     * 查询正在召开的会议列表
-     * 会议状态: confState=30
-     * 0=暂存 1=取消会议  10=等待审批 15=审批超时 20=等待召开 30=正在召开 40=会议异常  50=会议结束 5=审批驳回 （原来为：0：等待召开 1：正在召开 2：召开完毕  3 ：暂存  ）
-     */
-    public static final String QUERY_BEING_LIST = "confAction_queryList1.action?confState=30";
 
     /**
      * 查询会议模板列表
