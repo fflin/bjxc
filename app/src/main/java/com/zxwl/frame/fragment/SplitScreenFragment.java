@@ -388,7 +388,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                             showNewSplit(currentIndex, currentChlidIndex);
                         } else if (object instanceof ConfirmEvent) {
                             ConfirmEvent confirmEvent = (ConfirmEvent) object;
-                            Toast.makeText(mContext, "分屏选择了" + confirmEvent.size, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "分屏选择了" + confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

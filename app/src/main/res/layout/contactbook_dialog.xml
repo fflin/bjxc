@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.zhy.android.percent.support.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zhy.android.percent.support.PercentRelativeLayout
     android:id="@+id/rl_confirm"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="#FFFFFF">
 
     <com.zhy.android.percent.support.PercentRelativeLayout
         android:id="@+id/employee_rl"
@@ -17,48 +18,53 @@
             android:id="@+id/tvEmployeeName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="18sp"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textColor="#000000"
             android:text="姓名"
+            android:textColor="#000000"
+            android:textSize="18sp"
             app:layout_widthPercent="33%"/>
+
         <TextView
             android:id="@+id/tvEmployeeNo"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="18sp"
-            android:textColor="#000000"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/tvEmployeeName"
+            android:layout_toRightOf="@+id/tvEmployeeName"
             android:gravity="center"
             android:text="编号"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tvEmployeeName"
-            android:layout_toEndOf="@+id/tvEmployeeName"
+            android:textColor="#000000"
+            android:textSize="18sp"
             app:layout_widthPercent="33%"/>
+
         <TextView
             android:id="@+id/tvEmployeeType"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="18sp"
-            android:textColor="#000000"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/tvEmployeeNo"
+            android:layout_toRightOf="@+id/tvEmployeeNo"
             android:gravity="center"
             android:text="终端类型"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tvEmployeeNo"
-            android:layout_toEndOf="@+id/tvEmployeeNo"
+            android:textColor="#000000"
+            android:textSize="18sp"
             app:layout_widthPercent="33%"/>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
-            android:background="#666666"/>
+
     </com.zhy.android.percent.support.PercentRelativeLayout>
+
+    <View
+        android:id="@+id/view_line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_below="@id/employee_rl"
+        android:background="#666666"/>
 
     <com.baoyz.swipemenulistview.SwipeMenuListView
         android:id="@+id/lv_confirm"
-        android:layout_below="@id/employee_rl"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/view_line">
 
     </com.baoyz.swipemenulistview.SwipeMenuListView>
 

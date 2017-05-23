@@ -144,7 +144,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
                         new Action1<ConfirmEvent>() {
                             @Override
                             public void call(ConfirmEvent confirmEvent) {
-                                Toast.makeText(mContext, "会场控制选择了"+confirmEvent.size, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "会场控制选择了"+confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
                             }
                         }
                 );

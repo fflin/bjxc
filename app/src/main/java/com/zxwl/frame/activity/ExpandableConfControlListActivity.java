@@ -2,7 +2,6 @@ package com.zxwl.frame.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.UiThread;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -10,13 +9,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
 import com.lcodecore.tkrefreshlayout.header.progresslayout.ProgressLayout;
 import com.zxwl.frame.R;
-import com.zxwl.frame.adapter.ConfControlAdapter;
 import com.zxwl.frame.adapter.ExpandableConfControlAdapter;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.ConfBeanParent;
@@ -57,12 +54,12 @@ public class ExpandableConfControlListActivity extends BaseActivity {
     private RecyclerView rvList;
     private int PAGE_SIZE = 5;
     private int PAGE_NUM = 0;
-    private List<ConfBean> list = new ArrayList<>();
+//    private List<ConfBean> list = new ArrayList<>();
     /*列表刷新-end*/
 
-    private ConfControlAdapter adapter;
-    private ExpandableConfControlAdapter expandableAdapter;
-    private List<ConfBeanParent> confBeanParentList = new ArrayList<>();
+    //    private ConfControlAdapter adapter;
+    private ExpandableConfControlAdapter adapter;
+    private List<ConfBeanParent> list = new ArrayList<>();
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ExpandableConfControlListActivity.class));
@@ -94,6 +91,7 @@ public class ExpandableConfControlListActivity extends BaseActivity {
             tvName.setText(userInfo.name);
         }
 
+        //TODO 测试代码，正式时删除
         ConfBean confBean1 = new ConfBean();
         confBean1.showControl = false;
 
@@ -106,68 +104,72 @@ public class ExpandableConfControlListActivity extends BaseActivity {
         ConfBean confBean4 = new ConfBean();
         confBean4.showControl = false;
 
+        ConfBean confBean5 = new ConfBean();
+        confBean5.showControl = false;
+
+        ConfBean confBean6 = new ConfBean();
+        confBean6.showControl = false;
+
+        ConfBean confBean7 = new ConfBean();
+        confBean7.showControl = false;
+
+        ConfBean confBean8 = new ConfBean();
+        confBean8.showControl = false;
+
         ConfBeanParent confBeanParent1 = new ConfBeanParent("正在召开的会议", Arrays.asList(confBean1, confBean2, confBean3, confBean4));
 
-        ConfBeanParent confBeanParent2 = new ConfBeanParent("等待召开的会议", Arrays.asList(confBean1, confBean2, confBean3, confBean4));
+        ConfBeanParent confBeanParent2 = new ConfBeanParent("等待召开的会议", Arrays.asList(confBean5, confBean6, confBean7, confBean8));
 
-        confBeanParentList.add(confBeanParent1);
-        confBeanParentList.add(confBeanParent2);
+        list.add(confBeanParent1);
+        list.add(confBeanParent2);
+        //TODO 测试代码，正式时删除
 
-        expandableAdapter = new ExpandableConfControlAdapter(confBeanParentList);
-        expandableAdapter.setExpandCollapseListener(new ExpandableRecyclerAdapter.ExpandCollapseListener() {
-            @UiThread
+        adapter = new ExpandableConfControlAdapter(list);
+        adapter.setOnItemClickListener(new ExpandableConfControlAdapter.onItemClickListener() {
             @Override
-            public void onParentExpanded(int parentPosition) {
+            public void onClick(int parentPosition, int childPosition) {
+                setAdapterShow(parentPosition, childPosition);
             }
 
-            @UiThread
             @Override
-            public void onParentCollapsed(int parentPosition) {
+            public void onControl(int parentPosition, int childPosition) {
+                setAdapterShow(parentPosition, childPosition);
+                ConfBean confBean = list.get(parentPosition).getChildList().get(childPosition);
+                //控制会议
+                ConfControlActivity.startActivity(ExpandableConfControlListActivity.this, confBean.smcConfId, confBean.id);
+            }
+
+            @Override
+            public void onFinish(int parentPosition, int childPosition) {
+                setAdapterShow(parentPosition, childPosition);
+                ConfBean confBean = list.get(parentPosition).getChildList().get(childPosition);
+                //结束会议的网络请求
+                finishConfRequest(confBean.id, confBean.smcConfId, parentPosition, childPosition);
             }
         });
         rvList.setLayoutManager(new GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false));
-        rvList.setAdapter(expandableAdapter);
+        rvList.setAdapter(adapter);
 
-//        adapter = new ConfControlAdapter(list);
-//        adapter.setOnItemClickListener(new ConfControlAdapter.onItemClickListener() {
-//            @Override
-//            public void onClick(int position) {
-//                setAdapterShow(position);
-//            }
-//
-//            @Override
-//            public void onControl(int position) {
-//                setAdapterShow(position);
-//                //控制会议
-//                ConfControlActivity.startActivity(ExpandableConfControlListActivity.this, list.get(position).smcConfId,list.get(position).id);
-//            }
-//
-//            @Override
-//            public void onFinish(int position) {
-//                setAdapterShow(position);
-//                ConfBean confBean = list.get(position);
-//                //结束会议的网络请求
-//                finishConfRequest(confBean.id, confBean.smcConfId, position);
-//            }
-//        });
-//        rvList.setLayoutManager(new LinearLayoutManager(this));
         //初始化recyclerview
         initRefresh();
-        refreshLayout.startRefresh();
+        //TODO 正式使用时取消注释
+//        refreshLayout.startRefresh();
     }
 
     /**
      * 设置adapter的显示
      *
-     * @param position 下标
+     * @param parentPosition 在父层级的位置
+     * @param childPosition  在子层级的位置
      */
-    private void setAdapterShow(int position) {
-        for (int i = 0, count = list.size(); i < count; i++) {
-            if (i != position) {
-                list.get(i).showControl = false;
+    private void setAdapterShow(int parentPosition, int childPosition) {
+        List<ConfBean> childList = list.get(parentPosition).getChildList();
+        for (int i = 0, count = childList.size(); i < count; i++) {
+            if (i != childPosition) {
+                childList.get(i).showControl = false;
             }
         }
-        ConfBean bean = list.get(position);
+        ConfBean bean = childList.get(childPosition);
         bean.showControl = !bean.showControl;
         adapter.notifyDataSetChanged();
     }
@@ -233,10 +235,10 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                 new Func2<DataList<ConfBean>, DataList<ConfBean>, List<ConfBeanParent>>() {
                     @Override
                     public List<ConfBeanParent> call(DataList<ConfBean> confBeanDataList, DataList<ConfBean> confBeanDataList2) {
-                        List<ConfBeanParent> confBeanParentList = new ArrayList<ConfBeanParent>();
-                        confBeanParentList.add(new ConfBeanParent("正在召开的会议", confBeanDataList.dataList));
-                        confBeanParentList.add(new ConfBeanParent("即将召开的会议", confBeanDataList2.dataList));
-                        return confBeanParentList;
+                        List<ConfBeanParent> list = new ArrayList<ConfBeanParent>();
+                        list.add(new ConfBeanParent("正在召开的会议", confBeanDataList.dataList));
+                        list.add(new ConfBeanParent("即将召开的会议", confBeanDataList2.dataList));
+                        return list;
                     }
                 })
                 .compose(this.bindToLifecycle())
@@ -255,70 +257,70 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                 });
 
 
-        HttpUtils.getInstance(this)
-                .getRetofitClinet()
-                .builder(ConfApi.class)
-                .getConfBeinglList(PAGE_SIZE, pageNum)
-                .compose(this.<DataList<ConfBean>>bindToLifecycle())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        result -> {
-                            //成功则代表请求到数据
-                            if (null != result.dataList) {
-//                                && result.dataList.size() > 0
-                                //给所有的bean添加状态
-                                for (int i = 0, count = result.dataList.size(); i < count; i++) {
-                                    result.dataList.get(i).showControl = false;
-                                }
-
-                                //1为刷新，否则为加载更多
-                                if (1 == pageNum) {
-                                    PAGE_NUM = 1;
-                                    list.clear();
-                                    list.addAll(result.dataList);
-                                    refreshLayout.finishRefreshing();
-                                    //刷新的时候设置加载更多可以使用
-                                    refreshLayout.setEnableLoadmore(true);
-                                    Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    PAGE_NUM++;
-                                    list.addAll(result.dataList);
-                                    refreshLayout.finishLoadmore();
-                                    Toast.makeText(ExpandableConfControlListActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
-                                }
-
-                                //刷新适配器
-                                adapter.notifyDataSetChanged();
-
-                                //如果当前条数大于或等于总条数则禁用加载更多
-                                if (list.size() >= Integer.parseInt(result.rowSum)) {
-                                    refreshLayout.setEnableLoadmore(false);
-                                }
-                            } else {
-                                if (1 == pageNum) {
-                                    //清空所有数据
-                                    list.clear();
-                                    //根据样式刷新布局
-                                    adapter.notifyDataSetChanged();
-                                    Toast.makeText(ExpandableConfControlListActivity.this, "当前没有会议", Toast.LENGTH_SHORT).show();
-                                    refreshLayout.finishRefreshing();
-                                } else {
-                                    Toast.makeText(ExpandableConfControlListActivity.this, "当前没有更多会议", Toast.LENGTH_SHORT).show();
-                                    refreshLayout.finishLoadmore();
-                                }
-                            }
-                        },
-                        //产生异常
-                        responeThrowable -> {
-                            Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
-                            if (1 == pageNum) {
-                                refreshLayout.finishRefreshing();
-                            } else {
-                                refreshLayout.finishLoadmore();
-                            }
-                        }
-                );
+//        HttpUtils.getInstance(this)
+//                .getRetofitClinet()
+//                .builder(ConfApi.class)
+//                .getConfBeinglList(PAGE_SIZE, pageNum)
+//                .compose(this.<DataList<ConfBean>>bindToLifecycle())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(
+//                        result -> {
+//                            //成功则代表请求到数据
+//                            if (null != result.dataList) {
+////                                && result.dataList.size() > 0
+//                                //给所有的bean添加状态
+//                                for (int i = 0, count = result.dataList.size(); i < count; i++) {
+//                                    result.dataList.get(i).showControl = false;
+//                                }
+//
+//                                //1为刷新，否则为加载更多
+//                                if (1 == pageNum) {
+//                                    PAGE_NUM = 1;
+//                                    list.clear();
+//                                    list.addAll(result.dataList);
+//                                    refreshLayout.finishRefreshing();
+//                                    //刷新的时候设置加载更多可以使用
+//                                    refreshLayout.setEnableLoadmore(true);
+//                                    Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
+//                                } else {
+//                                    PAGE_NUM++;
+//                                    list.addAll(result.dataList);
+//                                    refreshLayout.finishLoadmore();
+//                                    Toast.makeText(ExpandableConfControlListActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+//                                }
+//
+//                                //刷新适配器
+//                                adapter.notifyDataSetChanged();
+//
+//                                //如果当前条数大于或等于总条数则禁用加载更多
+//                                if (list.size() >= Integer.parseInt(result.rowSum)) {
+//                                    refreshLayout.setEnableLoadmore(false);
+//                                }
+//                            } else {
+//                                if (1 == pageNum) {
+//                                    //清空所有数据
+//                                    list.clear();
+//                                    //根据样式刷新布局
+//                                    adapter.notifyDataSetChanged();
+//                                    Toast.makeText(ExpandableConfControlListActivity.this, "当前没有会议", Toast.LENGTH_SHORT).show();
+//                                    refreshLayout.finishRefreshing();
+//                                } else {
+//                                    Toast.makeText(ExpandableConfControlListActivity.this, "当前没有更多会议", Toast.LENGTH_SHORT).show();
+//                                    refreshLayout.finishLoadmore();
+//                                }
+//                            }
+//                        },
+//                        //产生异常
+//                        responeThrowable -> {
+//                            Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+//                            if (1 == pageNum) {
+//                                refreshLayout.finishRefreshing();
+//                            } else {
+//                                refreshLayout.finishLoadmore();
+//                            }
+//                        }
+//                );
     }
 
 
@@ -327,9 +329,10 @@ public class ExpandableConfControlListActivity extends BaseActivity {
      *
      * @param confId
      * @param smcConfId
-     * @param position
+     * @param parentPosition
+     * @param childPosition
      */
-    private void finishConfRequest(String confId, String smcConfId, final int position) {
+    private void finishConfRequest(String confId, String smcConfId, final int parentPosition, int childPosition) {
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
@@ -340,7 +343,7 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                 .subscribe(
                         s -> {
                             Toast.makeText(ExpandableConfControlListActivity.this, "会议结束", Toast.LENGTH_SHORT).show();
-                            adapter.reomve(position);
+                            adapter.reomve(parentPosition, childPosition);
                         },
                         //产生异常
                         responeThrowable -> {

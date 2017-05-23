@@ -1,6 +1,8 @@
 package com.zxwl.frame.adapter;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -73,73 +75,74 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
             childViewHolder.rlControl.setVisibility(View.INVISIBLE);
             childViewHolder.rlInfo.setVisibility(View.VISIBLE);
         }
-
-        childViewHolder.tvName.setText(confBean.name);//会议名称
-        childViewHolder.tvTime.setText(confBean.beginTime);
-        childViewHolder.tvPhone.setText(confBean.contactTelephone);
-        childViewHolder.tvPattern.setText("讨论模式");
+        //TODO 正常使用时取消注释
+//        childViewHolder.tvName.setText(confBean.name);//会议名称
+//        childViewHolder.tvTime.setText(confBean.beginTime);
+//        childViewHolder.tvPhone.setText(confBean.contactTelephone);
+//        childViewHolder.tvPattern.setText("讨论模式");
 
 //0=周期性视频会议、1=周期性非视频会议、2=视频会议、3=非视频会议、4=即时视频会议、5=即时非视频会议、6、周期性子视频会议、7、周期性子非视频会议
-        String confType = "周期性视频会议";
-        switch (confBean.confType) {
-            case "0":
-                confType = "周期性视频会议";
-                break;
-
-            case "1":
-                confType = "周期性非视频会议";
-                break;
-
-            case "2":
-                confType = "视频会议";
-                break;
-
-            case "3":
-                confType = "非视频会议";
-                break;
-
-            case "4":
-                confType = "即时视频会议";
-                break;
-
-            case "5":
-                confType = "即时非视频会议";
-                break;
-
-            case "6":
-                confType = "周期性子视频会议";
-                break;
-
-            case "7":
-                confType = "周期性子非视频会议";
-                break;
-
-            default:
-                break;
-        }
-        childViewHolder.tvType.setText(confType);
+//        String confType = "周期性视频会议";
+//        switch (confBean.confType) {
+//            case "0":
+//                confType = "周期性视频会议";
+//                break;
+//
+//            case "1":
+//                confType = "周期性非视频会议";
+//                break;
+//
+//            case "2":
+//                confType = "视频会议";
+//                break;
+//
+//            case "3":
+//                confType = "非视频会议";
+//                break;
+//
+//            case "4":
+//                confType = "即时视频会议";
+//                break;
+//
+//            case "5":
+//                confType = "即时非视频会议";
+//                break;
+//
+//            case "6":
+//                confType = "周期性子视频会议";
+//                break;
+//
+//            case "7":
+//                confType = "周期性子非视频会议";
+//                break;
+//
+//            default:
+//                break;
+//        }
+//        childViewHolder.tvType.setText(confType);
 
         childViewHolder.rlContent.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
-                        itemClickListener.onClick(childViewHolder.getAdapterPosition());
+                        itemClickListener.onClick(parentPosition, childPosition);
                     }
                 });
 
         childViewHolder.tvControl.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
-                        itemClickListener.onControl(childViewHolder.getAdapterPosition());
+                        itemClickListener.onControl(parentPosition, childPosition);
                     }
                 });
         childViewHolder.tvFinish.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
-                        itemClickListener.onFinish(childViewHolder.getAdapterPosition());
+                        itemClickListener.onFinish(parentPosition, childPosition);
                     }
                 });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
@@ -167,20 +170,25 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
         }
     }
 
+    public void reomve(int parentPosition, int childPosition) {
+        getParentList().get(parentPosition).getChildList().remove(childPosition);
+        notifyDataSetChanged();
+    }
+
     class ParentHolder extends ParentViewHolder {
         TextView tvContent;
 
         public ParentHolder(View itemView) {
             super(itemView);
-            tvContent = (TextView) itemView.findViewById(R.id.tv_content);
+            tvContent = (TextView) itemView;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
         @Override
         public void onExpansionToggled(boolean expanded) {
             super.onExpansionToggled(expanded);
 
             Logger.i("onExpansionToggled:" + expanded);
-
             tvContent.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.icon_item_control_left, 0, expanded ? R.mipmap.icon_expand : R.mipmap.item_pack_up, 0);
         }
     }
@@ -213,7 +221,6 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
         }
     }
 
-
     private onItemClickListener itemClickListener;
 
     public void setOnItemClickListener(onItemClickListener itemClickListener) {
@@ -221,10 +228,10 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
     }
 
     public interface onItemClickListener {
-        void onClick(int position);
+        void onClick(int parentPosition, int childPosition);
 
-        void onControl(int position);
+        void onControl(int parentPosition, int childPosition);
 
-        void onFinish(int position);
+        void onFinish(int parentPosition, int childPosition);
     }
 }

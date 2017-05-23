@@ -159,7 +159,7 @@ public class ConfControlFragment extends BaseFragment {
                 Toast.makeText(mContext, "此功能正在开发中", Toast.LENGTH_SHORT).show();
 //                adapter.remove(position);
 //                Site site = siteList.get(position);
-                //TODO 移除会场
+                //TODO 移除会场,接口没调
 //                delSIte(smcConfId, conferenceInfo.confId, site.siteInfo.uri, position);
             }
         });
@@ -369,7 +369,7 @@ public class ConfControlFragment extends BaseFragment {
                         new Action1<ConfirmEvent>() {
                             @Override
                             public void call(ConfirmEvent confirmEvent) {
-                                Toast.makeText(mContext, "会议控制选择了" + confirmEvent.size, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "会议控制选择了" + confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
