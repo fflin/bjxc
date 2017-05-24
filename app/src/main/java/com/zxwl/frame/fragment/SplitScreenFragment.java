@@ -85,13 +85,13 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     private ImageView ivTwentyFour;//24
     private SwitchView svPoll;//轮询多画面
 
+    private TextView tvSelectTime;//选择轮询时间
+
     private boolean falgPoll;//是否是轮询多画面
     private String pollTime;//轮询时间
 
     private RecyclerView rvList;
     private SplitScreenRightAdapter rightAdapter;
-
-    private Gson gson = new Gson();
 
     private ConferenceInfo conferenceInfo;//会议信息
     private ConferenceStatus conferenceStatus;//会议状态
@@ -104,6 +104,8 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     private String presenceMode;//分屏模式
 
     private Subscription subscription;
+
+    private Gson gson = new Gson();
 
     public SplitScreenFragment() {
     }
@@ -146,11 +148,13 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         ivTwenty = (ImageView) view.findViewById(R.id.iv_twenty);
         ivTwentyFour = (ImageView) view.findViewById(R.id.iv_twenty_four);
         svPoll = (SwitchView) view.findViewById(R.id.sv_poll);
+        tvSelectTime = (TextView) view.findViewById(R.id.tv_select_time);
     }
 
     @Override
     protected void init() {
-        presenceMode = "CP_1_1";
+        //分屏的模式
+        presenceMode = "1";
         fsdLayout.setUnitWidthNum(1);
         fsdLayout.setUnitHeightNum(1);
         detailViewList.clear();
@@ -218,7 +222,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
 
         //获得会议信息
         getConfInfo();
-
+        //初始化rxbus
         initRxBus();
     }
 
@@ -243,17 +247,22 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         ivTwenty.setOnClickListener(this);//20
         ivTwentyFour.setOnClickListener(this);//24
 
+        tvSelectTime.setOnClickListener(this);
+
+
         svPoll.setOnStateChangedListener(new SwitchView.OnStateChangedListener() {
             @Override
             public void toggleToOn(SwitchView view) {
                 falgPoll = true;
                 svPoll.setOpened(true);
+                tvSelectTime.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void toggleToOff(SwitchView view) {
                 falgPoll = false;
                 svPoll.setOpened(false);
+                tvSelectTime.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -446,35 +455,17 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
 
             //重置
             case R.id.tv_reset:
-                View outerView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_wheel_view, null);
-                WheelView wv = (WheelView) outerView.findViewById(R.id.wheel_view_wv);
-                wv.setItems(Arrays.asList("5", "10", "15", "20"));
-
-                MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                        .title("请选择轮询时间")
-                        .customView(outerView, false)
-                        .positiveText("确定")
-                        .negativeText("取消")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                pollTime = wv.getSeletedItem();
-                                Toast.makeText(getContext(), pollTime + "秒", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .build();
-                //设置对话框的宽度
-                dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
-                //点击对话框以外的地方，对话框不消失
-                dialog.setCanceledOnTouchOutside(false);
-                //点击对话框意外的地方和返回键，对话框都不消失
-//              dialog.setCancelable(false);
-                dialog.show();
+                showNewSplit(1, 0);
                 break;
 
             //所有分屏样式
             case R.id.tv_all_split:
                 SplitScreenDialogActivity.startActivity(getActivity());
+                break;
+
+            //选择轮询时间
+            case R.id.tv_select_time:
+                selectPollTime();
                 break;
 
             //1
@@ -549,6 +540,36 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             default:
                 break;
         }
+    }
+
+    /**
+     * 选择轮询时间
+     */
+    private void selectPollTime() {
+        View outerView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_wheel_view, null);
+        WheelView wv = (WheelView) outerView.findViewById(R.id.wheel_view_wv);
+        wv.setItems(Arrays.asList("5", "10", "15", "20"));
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("请选择轮询时间")
+                .customView(outerView, false)
+                .positiveText("确定")
+                .negativeText("取消")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        pollTime = wv.getSeletedItem();
+                        Toast.makeText(getContext(), pollTime + "秒", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .build();
+        //设置对话框的宽度
+        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //点击对话框以外的地方，对话框不消失
+        dialog.setCanceledOnTouchOutside(false);
+        //点击对话框意外的地方和返回键，对话框都不消失
+//              dialog.setCancelable(false);
+        dialog.show();
     }
 
     /**

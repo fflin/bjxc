@@ -245,7 +245,7 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                         list.clear();
                         //刷新适配器
                         list.addAll(confBeanParents);
-
+                        adapter.setResetFalg(true);
                         adapter.notifyParentDataSetChanged(true);
                         Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
                     }

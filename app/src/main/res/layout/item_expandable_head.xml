@@ -7,7 +7,7 @@
     android:drawableLeft="@mipmap/icon_item_control_left"
     android:drawableRight="@mipmap/icon_expand"
     android:paddingBottom="6dp"
-    android:paddingTop="6dp"
+    android:paddingTop="12dp"
     android:textColor="#333"
     android:gravity="center_vertical"
     android:drawablePadding="6dp"

@@ -26,6 +26,13 @@ import java.util.List;
  * 会议控制列表的适配器
  */
 public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<ConfBeanParent, ConfBean, ExpandableConfControlAdapter.ParentHolder, ExpandableConfControlAdapter.ChildHolder> {
+    //刷新时，是否重置右边图标的标志
+    private boolean resetFalg = true;
+
+    public void setResetFalg(boolean resetFalg) {
+        this.resetFalg = resetFalg;
+    }
+
     /**
      * Primary constructor. Sets up {@link #mParentList} and {@link #mFlatItemList}.
      * <p>
@@ -63,7 +70,9 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
     public void onBindParentViewHolder(@NonNull ParentHolder parentViewHolder, int parentPosition, @NonNull ConfBeanParent parent) {
         parentViewHolder.tvContent.setText(parent.type);
         //当重新设置parentList的时候要调用这个方法，强制设置右边的图标转换过来
-        parentViewHolder.onExpansionToggled(true);
+        if(resetFalg){
+            parentViewHolder.onExpansionToggled(true);
+        }
     }
 
     @Override
@@ -79,9 +88,9 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
         }
 
         childViewHolder.tvName.setText(confBean.name);//会议名称
-        childViewHolder.tvTime.setText(confBean.beginTime);
-        childViewHolder.tvPhone.setText(confBean.contactTelephone);
-        childViewHolder.tvPattern.setText("讨论模式");
+        childViewHolder.tvTime.setText(confBean.beginTime);//会议时间
+        childViewHolder.tvPhone.setText(confBean.contactTelephone);//联系电话
+        childViewHolder.tvPattern.setText("讨论模式");//会议模式
 
 //0=周期性视频会议、1=周期性非视频会议、2=视频会议、3=非视频会议、4=即时视频会议、5=即时非视频会议、6、周期性子视频会议、7、周期性子非视频会议
         String confType = "周期性视频会议";
@@ -121,11 +130,13 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
             default:
                 break;
         }
-        childViewHolder.tvType.setText(confType);
+        childViewHolder.tvType.setText(confType);//会议类型
+
         //设置点击事件
         childViewHolder.rlContent.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
+                        resetFalg = false;
                         itemClickListener.onClick(parentPosition, childPosition);
                     }
                 });
@@ -133,12 +144,14 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
         childViewHolder.tvControl.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
+                        resetFalg = false;
                         itemClickListener.onControl(parentPosition, childPosition);
                     }
                 });
         childViewHolder.tvFinish.setOnClickListener(
                 v -> {
                     if (null != itemClickListener) {
+                        resetFalg = false;
                         itemClickListener.onFinish(parentPosition, childPosition);
                     }
                 });

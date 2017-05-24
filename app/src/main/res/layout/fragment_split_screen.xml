@@ -7,23 +7,12 @@
     android:clipChildren="false"
     tools:context="com.zxwl.frame.fragment.ConfControlFragment">
 
-    <FrameLayout
-        android:id="@+id/fl_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/rl_spilt_operate"
-        android:layout_below="@id/tv_title"
-        android:layout_toLeftOf="@id/view_center"
-        android:visibility="gone">
-
-    </FrameLayout>
-
     <com.miao.freesizedraggablelayout.FreeSizeDraggableLayout
         android:id="@+id/fsd_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/rl_spilt_operate"
-        android:layout_below="@id/tv_title"
+        android:layout_below="@id/rl_title"
         android:layout_toLeftOf="@id/view_center"
         />
 
@@ -72,16 +61,68 @@
         android:background="#F5F5F5"/>
 
     <!--左侧分屏信息-start-->
-    <TextView
-        android:id="@+id/tv_title"
+
+    <RelativeLayout
+        android:id="@+id/rl_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/view_center"
-        android:paddingBottom="6dp"
-        android:paddingLeft="24dp"
-        android:paddingTop="6dp"
-        android:text="北京西城讨论会"
-        android:textSize="16sp"/>
+        android:layout_toLeftOf="@id/view_center">
+
+        <TextView
+            android:id="@+id/tv_select_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/tv_title"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/tv_title"
+            android:layout_marginBottom="3dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/bg_template"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="请选择轮询时间"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="6dp"
+            android:paddingLeft="24dp"
+            android:paddingTop="6dp"
+            android:text="北京西城讨论会"
+            android:textSize="16sp"/>
+
+        <ch.ielse.view.SwitchView
+            android:id="@+id/sv_poll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/tv_title"
+            android:layout_alignTop="@id/tv_title"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_toLeftOf="@id/tv_select_time"
+            android:paddingBottom="3dp"
+            android:paddingTop="3dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_poll_lable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/tv_title"
+            android:layout_alignTop="@id/tv_title"
+            android:layout_marginLeft="12dp"
+            android:layout_toLeftOf="@id/sv_poll"
+            android:gravity="center_vertical"
+            android:text="轮询多画面"/>
+
+    </RelativeLayout>
+
 
     <!--底部保存按钮-start-->
     <RelativeLayout
@@ -132,29 +173,6 @@
             android:textSize="14sp"
             />
 
-
-        <TextView
-            android:id="@+id/tv_poll_lable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="轮询多画面"
-            android:layout_marginLeft="12dp"
-            android:layout_alignBaseline="@+id/tv_save"
-            android:layout_alignBottom="@+id/tv_save"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"/>
-
-        <ch.ielse.view.SwitchView
-            android:id="@+id/sv_poll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/tv_save"
-            android:layout_alignTop="@id/tv_save"
-            android:layout_marginLeft="12dp"
-            android:layout_toRightOf="@id/tv_poll_lable"
-            android:paddingBottom="3dp"
-            android:paddingTop="3dp"
-            />
     </RelativeLayout>
 
 
