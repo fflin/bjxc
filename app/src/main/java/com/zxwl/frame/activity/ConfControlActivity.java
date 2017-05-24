@@ -185,6 +185,14 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != subscribe && !subscribe.isUnsubscribed()) {
+            subscribe.unsubscribe();
+        }
+    }
+
     private void initRxBus() {
         subscribe = RxBus.getInstance()
                 .toObserverable(ConfirmEvent.class)

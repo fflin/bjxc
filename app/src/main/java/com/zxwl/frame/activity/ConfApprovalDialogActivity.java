@@ -58,17 +58,19 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
     private TextView tvPass;//通过
     private TextView tvReject;//驳回
 
-    public static final String CONF_BEAN = "conf_bean";
-
-    private ConfBean confBean;
-    private String contactList;//参会列表
-
+    /*参会列表-start*/
     private List<Employee> hisEmployee = new ArrayList<>();
     private HashMap<String, List<Employee>> maps;
     private List<String> org1Names;
     private NewConfExpandableListViewAdapter expAdapter;
     private MaterialDialog dialog;
     private ExpandableListView explv;
+    /*参会列表-end*/
+
+
+    private ConfBean confBean;
+    private String contactList;//参会列表
+    public static final String CONF_BEAN = "conf_bean";
 
     @Override
     protected void findViews() {

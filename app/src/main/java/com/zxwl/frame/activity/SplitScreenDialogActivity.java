@@ -484,7 +484,6 @@ public class SplitScreenDialogActivity extends BaseActivity implements View.OnCl
             default:
                 break;
         }
-
         if (null != intent) {
             RxBus.getInstance().post(intent);
         }

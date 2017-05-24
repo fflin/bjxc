@@ -323,7 +323,7 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (subscribe != null && !subscribe.isUnsubscribed()) {
+        if (null != subscribe && !subscribe.isUnsubscribed()) {
             subscribe.unsubscribe();
         }
     }
