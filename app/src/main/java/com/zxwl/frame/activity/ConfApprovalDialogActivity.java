@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -89,6 +91,8 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
 
     @Override
     protected void initData() {
+        setWindowAttr();
+
         confBean = (ConfBean) getIntent().getSerializableExtra(CONF_BEAN);
 
         if (null != confBean) {
@@ -103,6 +107,18 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
             //获得参会列表
             getHistoryById(confBean.id);
         }
+    }
+
+    /**
+     * 设置activity的尺寸
+     */
+    private void setWindowAttr() {
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay(); // 为获取屏幕宽、高
+        WindowManager.LayoutParams p = getWindow().getAttributes();
+        p.height = (int) (d.getHeight() * 0.8); // 高度设置为屏幕的0.8
+        p.width = (int) (d.getWidth() * 0.7); // 宽度设置为屏幕的0.7
+        getWindow().setAttributes(p);
     }
 
     @Override
