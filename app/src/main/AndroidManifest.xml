@@ -48,59 +48,61 @@
         <!-- 会议预约界面 -->
         <activity
             android:name=".activity.BookingMeetingActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
 
         <!-- 主界面 -->
         <activity
             android:name=".activity.HomeActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
 
         <!-- 会议预约 -->
         <activity
             android:name=".activity.NewConfActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
 
         <!-- 会议审批弹出框 -->
         <activity
             android:name=".activity.ConfApprovalDialogActivity"
             android:screenOrientation="landscape"
-            android:theme="@style/dialogstyle">
-        </activity>
+            android:theme="@style/dialogstyle"/>
+
 
         <!-- 会议审批列表 -->
         <activity
             android:name=".activity.ConfApprovalListActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
         <activity
             android:name=".activity.SetImageActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
 
         <!-- 会议控制列表 -->
         <activity
             android:name=".activity.ConfControlListActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
 
         <!-- 可以收缩的会议控制列表 -->
         <activity
             android:name=".activity.ExpandableConfControlListActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
 
         <!-- 会议控制界面 -->
         <activity
             android:name=".activity.ConfControlActivity"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape"/>
+
+
+        <!--通讯录弹出框-->
         <activity
             android:name=".activity.ContactBookDialogActivity"
-            android:theme="@style/dialogstyle">
-        </activity>
+            android:theme="@style/dialogstyle"/>
+
         <!-- 锁屏 -->
         <service android:name=".views.lockscreen.LockScreenService"/>
 
@@ -116,6 +118,7 @@
                 <category android:name="android.intent.category.HOME"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.LockScreenActivity"
             android:label="@string/app_name"
@@ -129,10 +132,18 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SplitScreenDialogActivity"
-                  android:theme="@style/dialogstyle"
-            >
-        </activity>
+
+        <!--分屏模式选择弹出框-->
+        <activity
+            android:name=".activity.SplitScreenDialogActivity"
+            android:theme="@style/dialogstyle"
+            />
+
+        <!--模板管理-->
+        <activity
+            android:name=".activity.TemplateManagerActivity"
+            android:screenOrientation="landscape"
+            />
     </application>
 
 </manifest>

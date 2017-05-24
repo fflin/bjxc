@@ -149,4 +149,6 @@ dependencies {
     //recyclerview伸缩
     compile 'com.bignerdranch.android:expandablerecyclerview:3.0.0-RC1'//
     testCompile 'junit:junit:4.12'//
+    //
+    compile 'com.wang.avi:library:2.1.3'
 }

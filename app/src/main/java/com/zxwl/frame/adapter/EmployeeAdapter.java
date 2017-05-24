@@ -19,7 +19,6 @@ import java.util.List;
 /**
  * Created by asus-pc on 2017/4/27.
  */
-
 public class EmployeeAdapter extends BaseAdapter {
     private List<Employee> data;
     private Context context;

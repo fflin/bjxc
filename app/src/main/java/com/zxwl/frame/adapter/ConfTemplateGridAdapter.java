@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * author：hw
  * data:2017/4/26 11:09
- * 会议模板列表的适配器 紫
+ * 会议模板列表的适配器
  */
 public class ConfTemplateGridAdapter extends RecyclerView.Adapter<ConfTemplateGridAdapter.Holder> {
     private List<ConfBean> list;

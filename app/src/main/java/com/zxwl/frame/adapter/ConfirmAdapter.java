@@ -16,7 +16,6 @@ import java.util.List;
 /**
  * Created by asus-pc on 2017/5/5.
  */
-
 public class ConfirmAdapter extends BaseAdapter {
 
     private List<Employee> data;
