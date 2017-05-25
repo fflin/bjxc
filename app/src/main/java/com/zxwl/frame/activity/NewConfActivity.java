@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.dinuscxj.itemdecoration.GridOffsetsItemDecoration;
 import com.jzxiang.pickerview.TimePickerDialog;
@@ -41,6 +42,7 @@ import com.zxwl.frame.bean.Employee;
 import com.zxwl.frame.bean.ManagementGroupBean;
 import com.zxwl.frame.bean.SMSBean;
 import com.zxwl.frame.bean.UserInfo;
+import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.net.Urls;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.JsonGenericsSerializator;
@@ -51,6 +53,7 @@ import com.zxwl.frame.net.transformer.ListDefaultTransformer;
 import com.zxwl.frame.utils.DateUtil;
 import com.zxwl.frame.utils.DisplayUtil;
 import com.zxwl.frame.utils.UserHelper;
+import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 import com.zxwl.frame.views.spinner.NiceSpinner;
 
 import org.greenrobot.eventbus.EventBus;
@@ -264,6 +267,11 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         tvSmsEdit.setOnClickListener(this);//短信编辑按钮
         tvSave.setOnClickListener(this);//保存
         tvReset.setOnClickListener(this);//重置
+
+        tvLogOut.setOnClickListener(this);//退出登录
+        tvIssue.setOnClickListener(this);//帮助
+        tvHome.setOnClickListener(this);//返回主页
+        tvName.setOnClickListener(this);//名字
 
         exLv.setOnGroupClickListener((parent, v, groupPosition, id) -> {
                     boolean groupExpanded = parent.isGroupExpanded(groupPosition);
@@ -486,6 +494,44 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
             //会场名称
             case R.id.tv_site_name:
                 etDialogSMScontent.insertImage("file:///android_asset/icon_hcmc.png", "");
+                break;
+
+            //退出登录
+            case R.id.tv_log_out:
+                new MaterialDialog.Builder(this)
+                        .title("提示")
+                        .content("是否确认退出？")
+                        .negativeText("取消")
+                        .positiveText("确认")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                //修改登录状态
+                                PreferencesHelper.saveData(Account.IS_LOGIN, "false");
+                                //删除用户信息
+                                UserHelper.clearUserInfo(UserInfo.class);
+                                //跳转到登录页面
+                                LoginActivity.startActivity(NewConfActivity.this);
+                                dialog.dismiss();
+                            }
+                        })
+                        .build()
+                        .show();
+                break;
+
+            //帮助
+            case R.id.tv_issue:
+                Toast.makeText(this, "帮助", Toast.LENGTH_SHORT).show();
+                break;
+
+            //返回主页
+            case R.id.tv_home:
+                HomeActivity.startActivity(this);
+                break;
+
+            //名字
+            case R.id.tv_name:
+                Toast.makeText(this, "名字", Toast.LENGTH_SHORT).show();
                 break;
 
             default:
@@ -894,40 +940,6 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                           String contactPeople,
                           String contactTelephone,
                           String operatorId) {
-//        HttpUtils.getInstance(this)
-//                .getRetofitClinet()
-//                .builder(ConfApi.class)
-//                .saveConf(
-//                        contactList,
-//                        confParameters,
-//                        name,
-//                        schedulingTime,
-//                        endTime,
-//                        duration,
-//                        isEmail,
-//                        isSms,
-//                        smsId,
-//                        smsTitle,
-//                        smsContext,
-//                        contactPeople,
-//                        contactTelephone,
-//                        operatorId
-//                )
-//                .compose(this.<String>bindToLifecycle())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new RxSubscriber<String>() {
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        Toast.makeText(NewConfActivity.this, "预约成功", Toast.LENGTH_SHORT).show();
-//                        finish();
-//                    }
-//
-//                    @Override
-//                    protected void onError(ResponeThrowable responeThrowable) {
-//                        Toast.makeText(NewConfActivity.this, "预约失败", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
 
         Map<String, String> params = new HashMap<>();
         params.put("contactList", contactList);
@@ -964,6 +976,43 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         finish();
                     }
                 });
+    }
+
+    private void saveConf() {
+        //        HttpUtils.getInstance(this)
+//                .getRetofitClinet()
+//                .builder(ConfApi.class)
+//                .saveConf(
+//                        contactList,
+//                        confParameters,
+//                        name,
+//                        schedulingTime,
+//                        endTime,
+//                        duration,
+//                        isEmail,
+//                        isSms,
+//                        smsId,
+//                        smsTitle,
+//                        smsContext,
+//                        contactPeople,
+//                        contactTelephone,
+//                        operatorId
+//                )
+//                .compose(this.<String>bindToLifecycle())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new RxSubscriber<String>() {
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        Toast.makeText(NewConfActivity.this, "预约成功", Toast.LENGTH_SHORT).show();
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    protected void onError(ResponeThrowable responeThrowable) {
+//                        Toast.makeText(NewConfActivity.this, "预约失败", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
     }
 
     /**

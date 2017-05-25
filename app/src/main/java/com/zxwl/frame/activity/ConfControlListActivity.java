@@ -18,9 +18,11 @@ import com.zxwl.frame.adapter.ConfControlAdapter;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.DataList;
 import com.zxwl.frame.bean.UserInfo;
+import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.utils.UserHelper;
+import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 import com.zxwl.frame.views.spinner.NiceSpinner;
 
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ import rx.schedulers.Schedulers;
 /**
  * 会议控制列表
  */
-public class ConfControlListActivity extends BaseActivity {
+public class ConfControlListActivity extends BaseActivity implements View.OnClickListener {
     /*头部公用控件-start*/
     private TextView tvLogOut;
     private TextView tvIssue;
@@ -52,7 +54,7 @@ public class ConfControlListActivity extends BaseActivity {
     /*列表刷新-end*/
 
     private ConfControlAdapter adapter;
-
+    
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ConfControlListActivity.class));
     }
@@ -94,7 +96,7 @@ public class ConfControlListActivity extends BaseActivity {
             public void onControl(int position) {
                 setAdapterShow(position);
                 //控制会议
-                ConfControlActivity.startActivity(ConfControlListActivity.this, list.get(position).smcConfId,list.get(position).id);
+                ConfControlActivity.startActivity(ConfControlListActivity.this, list.get(position).smcConfId, list.get(position).id);
             }
 
             @Override
@@ -156,6 +158,11 @@ public class ConfControlListActivity extends BaseActivity {
 
     @Override
     protected void setListener() {
+        tvLogOut.setOnClickListener(this);//退出登录
+        tvIssue.setOnClickListener(this);//帮助
+        tvHome.setOnClickListener(this);//返回主页
+        tvName.setOnClickListener(this);//名字
+
         refreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(final TwinklingRefreshLayout refreshLayout) {
@@ -271,4 +278,33 @@ public class ConfControlListActivity extends BaseActivity {
                 );
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            //退出登录
+            case R.id.tv_log_out:
+                //修改登录状态
+                PreferencesHelper.saveData(Account.IS_LOGIN, "false");
+                //删除用户信息
+                UserHelper.clearUserInfo(UserInfo.class);
+                //跳转到登录页面
+                LoginActivity.startActivity(this);
+                break;
+
+            //帮助
+            case R.id.tv_issue:
+                Toast.makeText(this, "帮助", Toast.LENGTH_SHORT).show();
+                break;
+
+            //返回主页
+            case R.id.tv_home:
+                HomeActivity.startActivity(this);
+                break;
+
+            //名字
+            case R.id.tv_name:
+                Toast.makeText(this, "名字", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
 }

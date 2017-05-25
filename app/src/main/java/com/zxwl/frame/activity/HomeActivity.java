@@ -3,24 +3,30 @@ package com.zxwl.frame.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.zxwl.frame.AppManager;
 import com.zxwl.frame.R;
+import com.zxwl.frame.bean.UserInfo;
+import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.utils.UserHelper;
+import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 
 /**
  * 主页
  */
 public class HomeActivity extends BaseActivity implements View.OnClickListener {
-    private TextView tvLogOut;
-    private TextView tvIssue;
-    private TextView tvHome;
-    private TextView tvName;
+    private TextView tvLogOut;//退出登录
+    private TextView tvIssue;//帮助
+    private TextView tvHome;//返回主页
+    private TextView tvName;//名字
 
     private TextView tvConfSubscribe;
     private TextView tvConfApprove;
@@ -66,6 +72,11 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         tvConfApprove.setOnClickListener(this);
         tvConfControl.setOnClickListener(this);
         tvTemplateManage.setOnClickListener(this);
+
+        tvLogOut.setOnClickListener(this);//退出登录
+        tvIssue.setOnClickListener(this);//帮助
+        tvHome.setOnClickListener(this);//返回主页
+        tvName.setOnClickListener(this);//名字
     }
 
     @Override
@@ -88,13 +99,52 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
             //会议控制
             case R.id.tv_conf_control:
-//                ConfControlListActivity.startActivity(this);
                 ExpandableConfControlListActivity.startActivity(this);
                 break;
 
+            //会议模板
             case R.id.tv_template_manage:
                 Toast.makeText(this, "此功能正在开发中", Toast.LENGTH_SHORT).show();
                 break;
+
+            //退出登录
+            case R.id.tv_log_out:
+                new MaterialDialog.Builder(this)
+                        .title("提示")
+                        .content("是否确认退出？")
+                        .negativeText("取消")
+                        .positiveText("确认")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                //修改登录状态
+                                PreferencesHelper.saveData(Account.IS_LOGIN, "false");
+                                //删除用户信息
+                                UserHelper.clearUserInfo(UserInfo.class);
+                                //跳转到登录页面
+                                LoginActivity.startActivity(HomeActivity.this);
+                                dialog.dismiss();
+                            }
+                        })
+                        .build()
+                        .show();
+                break;
+
+            //帮助
+            case R.id.tv_issue:
+                Toast.makeText(this, "帮助", Toast.LENGTH_SHORT).show();
+                break;
+
+            //返回主页
+            case R.id.tv_home:
+                HomeActivity.startActivity(this);
+                break;
+
+            //名字
+            case R.id.tv_name:
+                Toast.makeText(this, "名字", Toast.LENGTH_SHORT).show();
+                break;
+
             default:
                 break;
         }
@@ -113,7 +163,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
         new Handler().postDelayed(
                 () -> {
                     isBackPressed = false;
-                },2000);
+                }, 2000);
     }
 
     @Override

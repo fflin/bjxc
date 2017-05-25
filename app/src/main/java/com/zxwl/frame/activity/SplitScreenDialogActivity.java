@@ -2,7 +2,9 @@ package com.zxwl.frame.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,51 +17,64 @@ import com.zxwl.frame.rx.RxBus;
 public class SplitScreenDialogActivity extends BaseActivity implements View.OnClickListener {
     private TextView tvTitle;
     private ImageView ivOne;
+
     private ImageView ivTwoA;
     private ImageView ivTwoB;
+
     private ImageView ivThreeA;
     private ImageView ivThreeB;
     private ImageView ivThreeC;
     private ImageView ivThreeD;
     private ImageView ivThreeE;
+
     private ImageView ivFourA;
     private ImageView ivFourB;
     private ImageView ivFourC;
     private ImageView ivFourD;
     private ImageView ivFourE;
     private ImageView ivFourF;
+
     private ImageView ivFiveA;
     private ImageView ivFiveB;
     private ImageView ivFiveC;
     private ImageView ivFiveD;
+
     private ImageView ivSixA;
     private ImageView ivSixB;
     private ImageView ivSixC;
     private ImageView ivSixD;
     private ImageView ivSixE;
+
     private ImageView ivSevenA;
     private ImageView ivSevenB;
     private ImageView ivSevenC;
     private ImageView ivSevenD;
     private ImageView ivSevenE;
+
     private ImageView ivEightA;
     private ImageView ivEightB;
     private ImageView ivEightC;
     private ImageView ivEightD;
+
     private ImageView ivNine;
+
     private ImageView ivTenA;
     private ImageView ivTenB;
     private ImageView ivTenC;
     private ImageView ivTenD;
     private ImageView ivTenE;
     private ImageView ivTenF;
+
     private ImageView ivThirteenA;
     private ImageView ivThirteenB;
     private ImageView ivThirteenC;
     private ImageView ivThirteenD;
     private ImageView ivThirteenE;
+
     private ImageView ivSixteen;
+
     private ImageView ivTwenty;
+
     private ImageView ivTwentyFour;
 
     public final static String CURRENT_INDEX = "current_index";
@@ -120,7 +135,7 @@ public class SplitScreenDialogActivity extends BaseActivity implements View.OnCl
 
     @Override
     protected void initData() {
-
+        setWindowAttr();
     }
 
     @Override
@@ -179,7 +194,17 @@ public class SplitScreenDialogActivity extends BaseActivity implements View.OnCl
     protected int getLayoutId() {
         return R.layout.activity_split_screen_dialog;
     }
-
+    /**
+     * 设置activity的尺寸
+     */
+    private void setWindowAttr() {
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay(); // 为获取屏幕宽、高
+        WindowManager.LayoutParams p = getWindow().getAttributes();
+//        p.height = (int) (d.getHeight() * 0.8); // 高度设置为屏幕的0.8
+        p.width = (int) (d.getWidth() * 0.7); // 宽度设置为屏幕的0.7
+        getWindow().setAttributes(p);
+    }
     @Override
     public void onClick(View v) {
         Intent intent = null;

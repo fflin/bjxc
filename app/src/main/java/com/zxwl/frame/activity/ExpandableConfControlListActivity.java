@@ -2,6 +2,7 @@ package com.zxwl.frame.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -9,6 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
@@ -20,11 +23,13 @@ import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.ConfBeanParent;
 import com.zxwl.frame.bean.DataList;
 import com.zxwl.frame.bean.UserInfo;
+import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
 import com.zxwl.frame.net.exception.ResponeThrowable;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.utils.UserHelper;
+import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 import com.zxwl.frame.views.spinner.NiceSpinner;
 
 import java.util.ArrayList;
@@ -39,7 +44,7 @@ import rx.schedulers.Schedulers;
 /**
  * 会议控制列表
  */
-public class ExpandableConfControlListActivity extends BaseActivity {
+public class ExpandableConfControlListActivity extends BaseActivity implements View.OnClickListener {
     /*头部公用控件-start*/
     private TextView tvLogOut;
     private TextView tvIssue;
@@ -141,6 +146,11 @@ public class ExpandableConfControlListActivity extends BaseActivity {
 
     @Override
     protected void setListener() {
+        tvLogOut.setOnClickListener(this);//退出登录
+        tvIssue.setOnClickListener(this);//帮助
+        tvHome.setOnClickListener(this);//返回主页
+        tvName.setOnClickListener(this);//名字
+
         refreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onRefresh(final TwinklingRefreshLayout refreshLayout) {
@@ -348,6 +358,52 @@ public class ExpandableConfControlListActivity extends BaseActivity {
                             Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
                         }
                 );
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            //退出登录
+            case R.id.tv_log_out:
+                new MaterialDialog.Builder(this)
+                        .title("提示")
+                        .content("是否确认退出？")
+                        .negativeText("取消")
+                        .positiveText("确认")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                //修改登录状态
+                                PreferencesHelper.saveData(Account.IS_LOGIN, "false");
+                                //删除用户信息
+                                UserHelper.clearUserInfo(UserInfo.class);
+                                //跳转到登录页面
+                                LoginActivity.startActivity(ExpandableConfControlListActivity.this);
+                                dialog.dismiss();
+                            }
+                        })
+                        .build()
+                        .show();
+                break;
+
+            //帮助
+            case R.id.tv_issue:
+                Toast.makeText(this, "帮助", Toast.LENGTH_SHORT).show();
+                break;
+
+            //返回主页
+            case R.id.tv_home:
+                HomeActivity.startActivity(this);
+                break;
+
+            //名字
+            case R.id.tv_name:
+                Toast.makeText(this, "名字", Toast.LENGTH_SHORT).show();
+                break;
+
+            default:
+                break;
+        }
     }
 
 }

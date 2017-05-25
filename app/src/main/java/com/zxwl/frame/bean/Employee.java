@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by asus-pc on 2017/4/27.
  */
 
-public class Employee implements Serializable{
+public class Employee implements Serializable {
     /**
      * effectTime :
      * email :
@@ -49,6 +49,15 @@ public class Employee implements Serializable{
     private String userName;
     private boolean ischecked = false;
     private boolean isClicked = false;
+
+
+    public Employee() {
+    }
+
+    public Employee(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public String getEffectTime() {
         return effectTime;

@@ -3,4 +3,6 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="error_msg">数据请求失败，请稍后再试</string>
+    <string name="contact_book_failed">请求失败,请点击重试!</string>
+    <string name="contact_book_nodata">暂无数据!</string>
 </resources>

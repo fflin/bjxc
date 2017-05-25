@@ -50,12 +50,11 @@
             android:name=".activity.BookingMeetingActivity"
             android:screenOrientation="landscape"/>
 
-
         <!-- 主界面 -->
         <activity
             android:name=".activity.HomeActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="landscape"/>
-
 
         <!-- 会议预约 -->
         <activity

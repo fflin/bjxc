@@ -48,6 +48,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     protected void initData() {
+        etName.setText(PreferencesHelper.getData(Account.LOGIN_NAME));
+        etPwd.setText(PreferencesHelper.getData(Account.LOGIN_PWD));
     }
 
     @Override
@@ -98,6 +100,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             new Toastor(LoginActivity.this).getSingletonToast("用户名不能为空").show();
             return;
         }
+        //登录的网络请求
         loginRequest(name, pwd);
     }
 
@@ -138,7 +141,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 UserHelper.saveUser(userInfo);
                                 //跳转到登录界面
                                 HomeActivity.startActivity(LoginActivity.this);
-                                finish();
+                                if(saveInfo){
+                                    //保存账号和密码
+                                    PreferencesHelper.saveData(Account.LOGIN_NAME, name);
+                                    PreferencesHelper.saveData(Account.LOGIN_PWD, pwd);
+                                }else {
+                                    //保存账号和密码
+                                    PreferencesHelper.saveData(Account.LOGIN_NAME, "");
+                                    PreferencesHelper.saveData(Account.LOGIN_PWD, "");
+                                    etPwd.setText("");
+                                    etName.setText("");
+                                }
                             }
 
                             @Override
@@ -165,7 +178,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //                            dialog.dismiss();
 //                            Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
 //                        }
-                        );
+                );
     }
 
 

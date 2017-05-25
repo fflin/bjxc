@@ -2,6 +2,7 @@ package com.zxwl.frame.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
@@ -21,10 +24,12 @@ import com.zxwl.frame.adapter.ConfApprovalListAdapter;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.DataList;
 import com.zxwl.frame.bean.UserInfo;
+import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.rx.RxBus;
 import com.zxwl.frame.utils.UserHelper;
+import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 import com.zxwl.frame.views.spinner.NiceSpinner;
 
 import java.util.ArrayList;
@@ -184,6 +189,12 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
 
     @Override
     protected void setListener() {
+        tvLogOut.setOnClickListener(this);//退出登录
+        tvIssue.setOnClickListener(this);//帮助
+        tvHome.setOnClickListener(this);//返回主页
+        tvName.setOnClickListener(this);//名字
+
+        //设置刷新事件
         refreshLayout.setOnRefreshListener(
                 new RefreshListenerAdapter() {
                     @Override
@@ -295,6 +306,44 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
                 listFalg = !listFalg;
                 //设置他的样式
                 setRecyclerLayout();
+                break;
+
+            //退出登录
+            case R.id.tv_log_out:
+                new MaterialDialog.Builder(this)
+                        .title("提示")
+                        .content("是否确认退出？")
+                        .negativeText("取消")
+                        .positiveText("确认")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                //修改登录状态
+                                PreferencesHelper.saveData(Account.IS_LOGIN, "false");
+                                //删除用户信息
+                                UserHelper.clearUserInfo(UserInfo.class);
+                                //跳转到登录页面
+                                LoginActivity.startActivity(ConfApprovalListActivity.this);
+                                dialog.dismiss();
+                            }
+                        })
+                        .build()
+                        .show();
+                break;
+
+            //帮助
+            case R.id.tv_issue:
+                Toast.makeText(this, "帮助", Toast.LENGTH_SHORT).show();
+                break;
+
+            //返回主页
+            case R.id.tv_home:
+                HomeActivity.startActivity(this);
+                break;
+
+            //名字
+            case R.id.tv_name:
+                Toast.makeText(this, "名字", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;

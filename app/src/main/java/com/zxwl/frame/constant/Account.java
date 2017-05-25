@@ -11,4 +11,14 @@ public class Account {
      * 是否登录
      */
     public static final String IS_LOGIN = "is_login";
+
+    /**
+     * 登录名
+     */
+    public static final String LOGIN_NAME = "login_name";
+
+    /**
+     * 登录密码
+     */
+    public static final String LOGIN_PWD = "login_pass";
 }
