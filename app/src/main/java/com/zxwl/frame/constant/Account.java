@@ -21,4 +21,9 @@ public class Account {
      * 登录密码
      */
     public static final String LOGIN_PWD = "login_pass";
+
+    /**
+     * 登录的时间
+     */
+    public static final String LOGIN_TIME = "login_pass";
 }

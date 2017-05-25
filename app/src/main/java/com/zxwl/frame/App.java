@@ -11,6 +11,8 @@ import com.zxwl.frame.net.config.NetWorkConfiguration;
 import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 
+import java.io.File;
+
 /**
  * Copyright 2015 蓝色互动. All rights reserved.
  * author：hw
@@ -22,11 +24,20 @@ public class App extends Application {
     public static App getInstance() {
         return mInstance;
     }
+    public static File appDir;
+
+    public static File getFile(){
+        return appDir;
+    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+
+        File cache = getCacheDir();
+         appDir = new File(cache,"ACache");
 
         PreferencesHelper.init(mInstance);
 

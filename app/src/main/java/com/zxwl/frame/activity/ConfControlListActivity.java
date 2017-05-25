@@ -54,7 +54,7 @@ public class ConfControlListActivity extends BaseActivity implements View.OnClic
     /*列表刷新-end*/
 
     private ConfControlAdapter adapter;
-    
+
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ConfControlListActivity.class));
     }

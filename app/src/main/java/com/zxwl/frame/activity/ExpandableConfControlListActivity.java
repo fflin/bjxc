@@ -58,7 +58,7 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
     /*列表刷新-start*/
     private TwinklingRefreshLayout refreshLayout;
     private RecyclerView rvList;
-    private int PAGE_SIZE = 5;
+    private int PAGE_SIZE = 10;
     private int PAGE_NUM = 0;
     private ExpandableConfControlAdapter adapter;
     private List<ConfBeanParent> list = new ArrayList<>();
