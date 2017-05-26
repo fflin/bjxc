@@ -6,7 +6,9 @@ package com.zxwl.frame.bean;
  * @author QYW
  * @date 2016-11-22 上午10:57:45
  */
-public class Site {
+public class Site implements Cloneable {
+    private static final long serialVersionUID = 369285298572941L;  //最好是显式声明ID
+
     public SiteInfo siteInfo;//会场信息
     public SiteStatus siteStatus;//会场状态
 //    public String unitId;//单位ID
@@ -21,7 +23,6 @@ public class Site {
     public boolean showRemoveControl;//是否显示移除会场控制界面
     public boolean splitCheck;//分屏控制是否被选中
 
-
     public String terminalName;
     public String mcuName;
     public String siteId;
@@ -32,5 +33,18 @@ public class Site {
     public String unitId;
     public String mobile;
     public String ip;
+
+    @Override
+    public Site clone() {
+        Site site = null;
+        try {
+            site = (Site) super.clone();
+            site.siteInfo = siteInfo.clone();  //对引用类型的域进行克隆
+            site.siteStatus = siteStatus.clone();  //对引用类型的域进行克隆
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return site;
+    }
 
 }

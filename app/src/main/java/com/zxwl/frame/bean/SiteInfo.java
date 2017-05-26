@@ -6,7 +6,7 @@ package com.zxwl.frame.bean;
  * data:2017/5/8 17:40
  * ClassName: ${Class_Name}
  */
-public class SiteInfo {
+public class SiteInfo implements Cloneable {
     public String dialingMode;//呼叫方式 0：MCU 呼叫会场 1：会场主动呼入
     public String dtmf;//二次拨号信息
     public String from;//会场来源
@@ -21,4 +21,15 @@ public class SiteInfo {
     public String videoFormat;//视频格式
     public String videoProtocol;//视频协议
 
+
+    @Override
+    public SiteInfo clone() {
+        SiteInfo siteInfo = null;
+        try {
+            siteInfo = (SiteInfo) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return siteInfo;
+    }
 }

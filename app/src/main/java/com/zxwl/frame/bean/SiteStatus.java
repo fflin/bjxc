@@ -7,7 +7,7 @@ package com.zxwl.frame.bean;
  * ClassName: ${Class_Name}
  */
 
-public class SiteStatus {
+public class SiteStatus implements Cloneable{
     public String uri;//会场标识
     public String name;//会场名称
     /**
@@ -36,4 +36,15 @@ public class SiteStatus {
      */
     public String participantType;//与会者类型，默认为终端会场。
     public String screens;//会场有多屏时，表示会场的屏数。会场屏数是1或者为语音会场时，此参数置空。
+
+    @Override
+    public SiteStatus clone() {
+        SiteStatus siteStatus = null;
+        try {
+            siteStatus = (SiteStatus) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return siteStatus;
+    }
 }

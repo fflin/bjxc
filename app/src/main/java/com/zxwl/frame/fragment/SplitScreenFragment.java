@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -35,6 +36,8 @@ import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
 import com.zxwl.frame.bean.ConfirmEvent;
 import com.zxwl.frame.bean.Site;
+import com.zxwl.frame.bean.SiteInfo;
+import com.zxwl.frame.bean.SiteStatus;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
 import com.zxwl.frame.net.exception.ResponeThrowable;
@@ -50,6 +53,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import ch.ielse.view.SwitchView;
@@ -149,11 +153,14 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         ivTwentyFour = (ImageView) view.findViewById(R.id.iv_twenty_four);
         svPoll = (SwitchView) view.findViewById(R.id.sv_poll);
         tvSelectTime = (TextView) view.findViewById(R.id.tv_select_time);
+
+        //TODO 测试代码，正式环境删除
+        view.findViewById(R.id.tv_poll_lable).setOnClickListener(this);
     }
 
     @Override
     protected void init() {
-        //分屏的模式
+        //设置分屏的模式
         presenceMode = "1";
         fsdLayout.setUnitWidthNum(1);
         fsdLayout.setUnitHeightNum(1);
@@ -166,6 +173,15 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
         confId = (String) arguments.get(ConfControlActivity.CONF_ID);
 
+        //TODO 测试代码，正式环境删除
+        Site site = null;
+        for (int i = 0; i < 5; i++) {
+            site = new Site();
+            site.siteInfo = new SiteInfo();
+            site.siteStatus = new SiteStatus();
+            site.siteInfo.name = "name-" + i;
+            siteList.add(site);
+        }
         rightAdapter = new SplitScreenRightAdapter(siteList);
         rvList.setAdapter(rightAdapter);
         rvList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -175,53 +191,12 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback); // Create ItemTouchHelper and pass with parameter the MyItemTouchHelperCallback
         touchHelper.attachToRecyclerView(rvList); // Attach ItemTouchHelper to RecyclerView
 
-        rvList.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    //抬起
-                    case MotionEvent.ACTION_UP:
-                        //手指抬起时所处于的view在fsdLayout子列表中的下标
-                        int eventCurrent = -1;
-                        boolean falg = false;
-                        float rawX = event.getRawX();
-                        float rawY = event.getRawY();
-                        //判断手指抬起时候的点是否在右边的布局当中
-                        for (int i = 0, count = fsdLayout.getChildCount(); i < count; i++) {
-                            View childAt = fsdLayout.getChildAt(i);
-                            falg = ViewUtil.isTouchPointInView(childAt, (int) rawX, (int) rawY);
-                            if (falg) {
-                                eventCurrent = i;
-                                break;
-                            }
-                        }
-                        //如果falg为true代表手指抬起的地方有view
-                        if (falg) {
-                            //获得出于抬起点的view
-                            DetailView detailView = detailViewList.get(eventCurrent);
-                            RecyclerView detailRecycler = (RecyclerView) detailView.getView();
-                            SplitScreenItemAdapter adapter = (SplitScreenItemAdapter) detailRecycler.getAdapter();
-                            //被拖动的site
-                            Site currentSite = siteList.get(currentIndex);
-                            //如果是轮询多画面则清空所有的site
-                            if (!falgPoll) {
-                                adapter.removeAll();
-                            }
-                            adapter.add(currentSite);
-                            adapter.notifyDataSetChanged();
-                            detailRecycler.smoothScrollToPosition(adapter.getItemCount() + 1);
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-                return false;
-            }
-        });
+        //设置右边recyclerview的触摸事件
+        setRecyclerOnTouch();
 
         //获得会议信息
         getConfInfo();
+
         //初始化rxbus
         initRxBus();
     }
@@ -246,9 +221,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         ivSixteen.setOnClickListener(this);//16
         ivTwenty.setOnClickListener(this);//20
         ivTwentyFour.setOnClickListener(this);//24
-
-        tvSelectTime.setOnClickListener(this);
-
+        tvSelectTime.setOnClickListener(this);//选择轮询时间
 
         svPoll.setOnStateChangedListener(new SwitchView.OnStateChangedListener() {
             @Override
@@ -283,6 +256,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         List<Site> sites = new ArrayList<>();
 
         SplitScreenItemAdapter adapter = new SplitScreenItemAdapter(sites);
+        //添加item的点击事件
         adapter.setOnItemClickListener(new SplitScreenItemAdapter.onItemClickListener() {
             @Override
             public void onClick(int position) {
@@ -292,7 +266,6 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                 rvList.smoothScrollToPosition(position);
             }
         });
-
         rvList.setAdapter(adapter);
         rvList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         return rvList;
@@ -382,27 +355,6 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                 });
     }
 
-    private void initRxBus() {
-        subscription = RxBus.getInstance()
-                .toObserverable(Object.class)
-                .compose(this.bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object object) {
-                        if (object instanceof Intent) {
-                            Intent intent = (Intent) object;
-                            int currentIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_INDEX, -1);
-                            int currentChlidIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_CHLID_INDEX, -1);
-                            showNewSplit(currentIndex, currentChlidIndex);
-                        } else if (object instanceof ConfirmEvent) {
-                            ConfirmEvent confirmEvent = (ConfirmEvent) object;
-                            Toast.makeText(mContext, "分屏选择了" + confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -411,35 +363,160 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         }
     }
 
+    /**
+     * 获得分屏信息
+     *
+     * @return 分屏信息
+     */
+    @Nullable
+    private String[] getSplitInfo() {
+        //判断是否有选择分屏数据
+        boolean emptyFalg = false;
+        //根据detailViewList的长度生成字符串数组
+        String[] subs = new String[detailViewList.size()];
+        //遍历所有的detailView
+        for (int i = 0, count = detailViewList.size(); i < count; i++) {
+            //创建字符串，拼接每一个detailView里包含的会场uri
+            StringBuilder childSubPics = new StringBuilder();
+            //获得detailView里的recyclerview
+            DetailView detail = detailViewList.get(i);
+            RecyclerView recycler = (RecyclerView) detail.getView();
+            //得到适配器并遍历里面的数据进行拼接
+            SplitScreenItemAdapter adapter = (SplitScreenItemAdapter) recycler.getAdapter();
+            List<Site> siteList = adapter.getSiteList();
+            //判断数据是否为空
+            if (siteList.size() > 0) {
+                emptyFalg = true;
+            }
+            //遍历里面的数据进行拼接
+            for (int j = 0; j < siteList.size(); j++) {
+                if (j == siteList.size() - 1) {
+                    childSubPics.append(siteList.get(j).siteInfo.uri);
+                } else {
+                    childSubPics.append(siteList.get(j).siteInfo.uri + ",");
+                }
+            }
+            //添加到字符串数组中
+            subs[i] = childSubPics.toString();
+        }
+        //如果emptyFalg为false则代表detailView所有的数据都为空，则提示用户选择分屏
+        if (!emptyFalg) {
+            Toast.makeText(mContext, "请选择分屏", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        return subs;
+    }
+
+    /**
+     * 选择轮询时间
+     */
+    private void selectPollTime() {
+        View outerView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_wheel_view, null);
+        WheelView wv = (WheelView) outerView.findViewById(R.id.wheel_view_wv);
+        wv.setItems(Arrays.asList("5", "10", "15", "20"));
+
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("请选择轮询时间")
+                .customView(outerView, false)
+                .positiveText("确定")
+                .negativeText("取消")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        pollTime = wv.getSeletedItem();
+                        Toast.makeText(getContext(), pollTime + "秒", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .build();
+        //设置对话框的宽度
+        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //点击对话框以外的地方，对话框不消失
+        dialog.setCanceledOnTouchOutside(false);
+        //点击对话框意外的地方和返回键，对话框都不消失
+        //dialog.setCancelable(false);
+        dialog.show();
+    }
+
+    /**
+     * 设置recyclerview的触摸事件
+     */
+    private void setRecyclerOnTouch() {
+        rvList.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    //抬起
+                    case MotionEvent.ACTION_UP:
+                        //手指抬起时所处于的view在fsdLayout子列表中的下标
+                        int eventCurrent = -1;
+                        boolean falg = false;
+                        float rawX = event.getRawX();
+                        float rawY = event.getRawY();
+                        //判断手指抬起时候的点是否在右边的布局当中
+                        for (int i = 0, count = fsdLayout.getChildCount(); i < count; i++) {
+                            View childAt = fsdLayout.getChildAt(i);
+                            falg = ViewUtil.isTouchPointInView(childAt, (int) rawX, (int) rawY);
+                            if (falg) {
+                                eventCurrent = i;
+                                break;
+                            }
+                        }
+                        //如果falg为true代表手指抬起的地方有view
+                        if (falg) {
+                            //获得出于抬起点的view
+                            DetailView detailView = detailViewList.get(eventCurrent);
+                            RecyclerView detailRecycler = (RecyclerView) detailView.getView();
+                            SplitScreenItemAdapter adapter = (SplitScreenItemAdapter) detailRecycler.getAdapter();
+                            //被拖动的site
+                            Site currentSite = siteList.get(currentIndex);
+                            //如果是轮询多画面则清空所有的site
+                            if (!falgPoll) {
+                                adapter.removeAll();
+                            }
+                            Site clone = currentSite.clone();
+                            adapter.add(currentSite.clone());
+                            adapter.notifyDataSetChanged();
+                            detailRecycler.smoothScrollToPosition(adapter.getItemCount() + 1);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //保存
-            case R.id.tv_save:
-                StringBuilder subPics = new StringBuilder();
-                String[] subs = new String[detailViewList.size()];
+            //删除里面的数据
+            case R.id.tv_poll_lable:
+                //遍历所有的分屏view
                 for (int i = 0, count = detailViewList.size(); i < count; i++) {
-                    StringBuilder childSubPics = new StringBuilder();
+                    //获得对应的view
                     DetailView detail = detailViewList.get(i);
                     RecyclerView recycler = (RecyclerView) detail.getView();
                     SplitScreenItemAdapter adapter = (SplitScreenItemAdapter) recycler.getAdapter();
                     List<Site> siteList = adapter.getSiteList();
-                    for (int j = 0; j < siteList.size(); j++) {
-                        if (j == siteList.size() - 1) {
-                            childSubPics.append(siteList.get(j).siteInfo.uri);
-                        } else {
-                            childSubPics.append(siteList.get(j).siteInfo.uri + ",");
-                        }
+
+                    Iterator<Site> siteIterator = siteList.iterator();
+                    while (siteIterator.hasNext()) {
+                        Site site = siteIterator.next();
+                        if (site.splitCheck)
+                            siteIterator.remove();//这里要使用Iterator的remove方法移除当前对象，如果使用List的remove方法，则同样会出现ConcurrentModificationException
                     }
-                    subs[i] = childSubPics.toString();
+                    adapter.notifyDataSetChanged();
+                    recycler.smoothScrollToPosition(0);
                 }
+                break;
 
-                Logger.i(subPics.toString().trim());
-
-                if (!(subs.length > 0)) {
-                    Toast.makeText(mContext, "请选择分屏", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            //保存
+            case R.id.tv_save:
+                //获得分屏信息
+                String[] subs = getSplitInfo();
+                if (subs == null) return;
 
                 //设置分屏
                 if (falgPoll) {
@@ -540,36 +617,6 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
             default:
                 break;
         }
-    }
-
-    /**
-     * 选择轮询时间
-     */
-    private void selectPollTime() {
-        View outerView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_wheel_view, null);
-        WheelView wv = (WheelView) outerView.findViewById(R.id.wheel_view_wv);
-        wv.setItems(Arrays.asList("5", "10", "15", "20"));
-
-        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
-                .title("请选择轮询时间")
-                .customView(outerView, false)
-                .positiveText("确定")
-                .negativeText("取消")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        pollTime = wv.getSeletedItem();
-                        Toast.makeText(getContext(), pollTime + "秒", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .build();
-        //设置对话框的宽度
-        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
-        //点击对话框以外的地方，对话框不消失
-        dialog.setCanceledOnTouchOutside(false);
-        //点击对话框意外的地方和返回键，对话框都不消失
-//              dialog.setCancelable(false);
-        dialog.show();
     }
 
     /**
@@ -832,6 +879,30 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                 break;
         }
         fsdLayout.setList(detailViewList);
+    }
+
+    /**
+     * 初始化rxbus
+     */
+    private void initRxBus() {
+        subscription = RxBus.getInstance()
+                .toObserverable(Object.class)
+                .compose(this.bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object object) {
+                        if (object instanceof Intent) {
+                            Intent intent = (Intent) object;
+                            int currentIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_INDEX, -1);
+                            int currentChlidIndex = intent.getIntExtra(SplitScreenDialogActivity.CURRENT_CHLID_INDEX, -1);
+                            showNewSplit(currentIndex, currentChlidIndex);
+                        } else if (object instanceof ConfirmEvent) {
+                            ConfirmEvent confirmEvent = (ConfirmEvent) object;
+                            Toast.makeText(mContext, "分屏选择了" + confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void set1_1() {
