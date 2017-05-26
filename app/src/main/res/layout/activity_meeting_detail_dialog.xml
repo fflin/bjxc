@@ -1,65 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="600dp"
-                android:background="@drawable/bg_approval_dialog"
-                android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_booking_meeting_input">
 
-    <RelativeLayout
-        android:id="@+id/rl_title"
+    <TextView
+        android:id="@+id/tv_title_lable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#C82A29"
+        android:gravity="center"
         android:paddingBottom="10dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
-        android:paddingTop="10dp">
+        android:paddingTop="10dp"
+        android:text="会议室详情"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bg_approval_top"
+        android:textSize="18sp"
+        android:drawableLeft="@mipmap/icon_arrow_back"/>
 
-        <TextView
-            android:id="@+id/tv_title_lable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="会议室详情"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"/>
-
-        <ImageView
-            android:id="@+id/iv_close"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/icon_arrow_back"/>
-    </RelativeLayout>
 
 
     <RelativeLayout
         android:id="@+id/rl_edit"
+        android:layout_below="@id/tv_title_lable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rl_title"
         android:background="#ffffff">
 
         <EditText
             android:id="@+id/et_list_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="40dp"
-            android:layout_marginTop="10dp"
+            android:focusable="false"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/bg_new_conf_input"
             android:drawablePadding="6dp"
             android:drawableRight="@mipmap/icon_search"
-            android:focusable="false"
             android:maxLines="1"
             android:padding="8dp"
-            android:singleLine="true"/>
+            android:singleLine="true" />
     </RelativeLayout>
 
     <ExpandableListView
@@ -67,8 +52,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/rl_edit"
-        android:background="#FFFFFF"
+        android:groupIndicator="@null"
         android:divider="@null"
-        android:groupIndicator="@null"/>
+        android:layout_margin="10dp">
 
+    </ExpandableListView>
 </RelativeLayout>

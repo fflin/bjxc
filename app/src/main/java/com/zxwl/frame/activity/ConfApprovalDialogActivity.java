@@ -3,21 +3,24 @@ package com.zxwl.frame.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
+import com.dinuscxj.itemdecoration.GridOffsetsItemDecoration;
 import com.zxwl.frame.R;
 import com.zxwl.frame.adapter.NewConfExpandableListViewAdapter;
 import com.zxwl.frame.bean.ConfBean;
+import com.zxwl.frame.bean.DataList;
 import com.zxwl.frame.bean.DepartBean;
 import com.zxwl.frame.bean.Employee;
 import com.zxwl.frame.net.api.ConfApi;
@@ -27,7 +30,6 @@ import com.zxwl.frame.net.http.HttpUtils;
 import com.zxwl.frame.net.transformer.ListDefaultTransformer;
 import com.zxwl.frame.rx.RxBus;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +37,9 @@ import java.util.List;
 import java.util.Set;
 
 import jp.wasabeef.richeditor.RichEditor;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -58,19 +62,17 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
     private TextView tvPass;//通过
     private TextView tvReject;//驳回
 
-    /*参会列表-start*/
+    public static final String CONF_BEAN = "conf_bean";
+
+    private ConfBean confBean;//从上个页面传递过来的会议bean
+    private String contactList;//参会列表
+
     private List<Employee> hisEmployee = new ArrayList<>();
     private HashMap<String, List<Employee>> maps;
     private List<String> org1Names;
     private NewConfExpandableListViewAdapter expAdapter;
-    private MaterialDialog dialog;
     private ExpandableListView explv;
-    /*参会列表-end*/
-
-
-    private ConfBean confBean;
-    private String contactList;//参会列表
-    public static final String CONF_BEAN = "conf_bean";
+    private AlertDialog alertDialog;
 
     @Override
     protected void findViews() {
@@ -93,9 +95,9 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
 
     @Override
     protected void initData() {
-        setWindowAttr();
-
         confBean = (ConfBean) getIntent().getSerializableExtra(CONF_BEAN);
+
+        getHistoryById(confBean.id);
 
         if (null != confBean) {
             tvName.setText(confBean.name);//会议名称
@@ -105,24 +107,11 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
             tvConfTime.setText(confBean.beginTime);//开始时间
             tvDuration.setText("预计" + confBean.endTime + "结束会议,时长" + confBean.duration + "分钟");//结束时间
             etSmsContent.setHtml(textToHtml(confBean.smsContext));//短信内容
-
-            //获得参会列表
-            getHistoryById(confBean.id);
         }
     }
 
-    /**
-     * 设置activity的尺寸
-     */
-    private void setWindowAttr() {
-        WindowManager m = getWindowManager();
-        Display d = m.getDefaultDisplay(); // 为获取屏幕宽、高
-        WindowManager.LayoutParams p = getWindow().getAttributes();
-        p.height = (int) (d.getHeight() * 0.8); // 高度设置为屏幕的0.8
-        p.width = (int) (d.getWidth() * 0.7); // 宽度设置为屏幕的0.7
-        getWindow().setAttributes(p);
-    }
-
+    //&lt;p&gt;您好&lt;--发送人--&gt;，&amp;nbsp;&amp;nbsp;&amp;nbsp;原定于&lt;--会议时间--&gt;召开的&lt;--会议名称--&gt;，因故取消！&amp;nbsp;&amp;nbsp;如有疑问，请联系视频管理员！&lt;--会场名称--&gt;&lt;/p&gt;
+    //&amp;amp;lt;p&amp;amp;gt;各位领导、同事：兹定于&amp;lt;--会议时间--&amp;gt;;召开&amp;lt;--会场名称--&amp;gt;;，请您准时参加&amp;amp;lt;/p&amp;amp;gt;
     @Override
     protected void setListener() {
         tvTitle.setOnClickListener(this);
@@ -152,10 +141,19 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
 
             case R.id.tv_check:
                 //创建对话框
-                dialog = new MaterialDialog.Builder(this)
-                        .customView(initDialogContent(), false)
-                        .build();
-                dialog.show();
+                alertDialog = new AlertDialog.Builder(this, R.style.dialogstyle)
+                        .setView(initDialogContent(null,null,null))
+                        .create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.show();
+                //设置对话框的尺寸
+                Window dialogWindow = alertDialog.getWindow();
+                WindowManager m = getWindowManager();
+                Display d = m.getDefaultDisplay(); // 获取屏幕宽、高度
+                WindowManager.LayoutParams p = dialogWindow.getAttributes(); // 获取对话框当前的参数值
+                p.height = (int) (d.getHeight() * 0.8); // 高度设置为屏幕的0.8，根据实际情况调整
+                p.width = (int) (d.getWidth() * 0.6); // 宽度设置为屏幕的0.6，根据实际情况调整
+                dialogWindow.setAttributes(p);
                 break;
 
             //通过
@@ -174,14 +172,16 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
     }
 
     @NonNull
-    private View initDialogContent() {
+    private View initDialogContent(RecyclerView.Adapter adapter, RecyclerView.LayoutManager layoutManager, GridOffsetsItemDecoration decoration) {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.activity_meeting_detail_dialog, null);
-        ImageView iv_close = (ImageView) dialogView.findViewById(R.id.iv_close);
+        TextView tv_close = (TextView) dialogView.findViewById(R.id.tv_title_lable);
         explv = (ExpandableListView) dialogView.findViewById(R.id.expand_list);
-        iv_close.setOnClickListener(
-                v -> {
-                    dialog.dismiss();
-                });
+        tv_close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
         if (maps.size() != 0 && org1Names.size() != 0) {
             expAdapter = new NewConfExpandableListViewAdapter(ConfApprovalDialogActivity.this, org1Names, maps);
             explv.setAdapter(expAdapter);
@@ -189,54 +189,49 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
         return dialogView;
     }
 
+
     /**
      * 会议审批通过的接口
      */
     private void passRequest() {
         String vetos = etOpinion.getText().toString();
-        try {
-            HttpUtils.getInstance(this)
-                    .getRetofitClinet()
-                    .builder(ConfApi.class)
-                    .approveEntity(
-                            contactList,
-                            confBean.confParameters,
-                            confBean.name,
-                            confBean.schedulingTime,
-                            confBean.endTime,
-                            confBean.duration,
-                            confBean.isEmail,
-                            confBean.isSms,
-                            confBean.smsId,
-                            new String(confBean.smsTitle.getBytes(), "UTF-8"),
-                            confBean.smsContext,
-                            confBean.contactPeople,
-                            confBean.contactTelephone,
-                            confBean.peopleIdOa,
-                            confBean.id,
-                            vetos)
-                    .compose(this.<String>bindToLifecycle())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            new RxSubscriber<String>() {
-                                @Override
-                                public void onSuccess(String s) {
-                                    RxBus.getInstance().post(0);
-                                    Toast.makeText(ConfApprovalDialogActivity.this, "会议通过", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }
+        HttpUtils.getInstance(this)
+                .getRetofitClinet()
+                .builder(ConfApi.class)
+                .approveEntity(
+                        contactList,
+                        confBean.confParameters,
+                        confBean.name,
+                        confBean.schedulingTime,
+                        confBean.endTime,
+                        confBean.duration,
+                        confBean.isEmail,
+                        confBean.isSms,
+                        confBean.smsId,
+                        confBean.smsTitle,
+                        confBean.smsContext,
+                        confBean.contactPeople,
+                        confBean.contactTelephone,
+                        confBean.peopleIdOa,
+                        confBean.id,
+                        vetos)
+                .compose(this.<String>bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new RxSubscriber<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        RxBus.getInstance().post(0);
+                        Toast.makeText(ConfApprovalDialogActivity.this, "会议通过", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
 
-                                @Override
-                                protected void onError(ResponeThrowable responeThrowable) {
-                                    Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }
-                            }
-                    );
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+                    @Override
+                    protected void onError(ResponeThrowable responeThrowable) {
+                        Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
     }
 
     /**
@@ -250,16 +245,20 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        s -> {
-                            RxBus.getInstance().post(0);
-                            Toast.makeText(ConfApprovalDialogActivity.this, "会议驳回", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }, responeThrowable -> {
-                            Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                );
+                .subscribe(new RxSubscriber<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        RxBus.getInstance().post(0);
+                        Toast.makeText(ConfApprovalDialogActivity.this, "会议驳回", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    @Override
+                    protected void onError(ResponeThrowable responeThrowable) {
+                        Toast.makeText(ConfApprovalDialogActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
     }
 
     /**
@@ -269,8 +268,6 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
      * @return 返回包含图片的数据
      */
     private String textToHtml(String context) {
-//&amp;amp;lt;p&amp;amp;gt;各位领导、同事：兹定于&amp;amp;lt;--会议时间--&amp;amp;gt;召开&amp;amp;lt;--会场名称--&amp;amp;gt;请您准时参加&amp;amp;lt;/p&amp;amp;gt;
-//amp;lt;pamp;gt;各位领导、同事：兹定于amp;lt;--会议时间--amp;gt;召开amp;lt;--会场名称--amp;gt;请您准时参加amp;lt;/pamp;gt;
         //会场名称
         //String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
         String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
@@ -278,13 +275,11 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
         String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
         String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
         String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
-        return context
-                .replaceAll("amp;", "")
-                .replaceAll("&lt;--会场名称--&gt;", hcmc)
-                .replaceAll("&lt;--会议号码--&gt;", hyhm)
-                .replaceAll("&lt;--会议名称--&gt;", hymc)
-                .replaceAll("&lt;--会议时间--&gt;", hysj)
-                .replaceAll("&lt;--收件人--&gt;", sjr);
+        return context.replaceAll("&amp;lt;--会场名称--&amp;gt", hcmc)
+                .replaceAll("&amp;lt;--会议号码--&amp;gt", hyhm)
+                .replaceAll("&amp;lt;--会议名称--&amp;gt", hymc)
+                .replaceAll("&amp;lt;--会议时间--&amp;gt", hysj)
+                .replaceAll("&amp;lt;--收件人--&amp;gt", sjr);
     }
 
     /**
@@ -297,83 +292,74 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
                 .getRetofitClinet()
                 .builder(ConfApi.class)
                 .findHistoryById(id)
-                .flatMap(
-                        s -> {
-                            contactList = s;
-                            return HttpUtils//
-                                    .getInstance(ConfApprovalDialogActivity.this)
-                                    .getRetofitClinet()
-                                    .builder(ConfApi.class)
-                                    .getPeopleList(s);
-                        }
-                )
+                .flatMap(new Func1<String, Observable<DataList<DepartBean>>>() {
+                    @Override
+                    public Observable<DataList<DepartBean>> call(String s) {
+                        contactList = s;
+                        return HttpUtils//
+                                .getInstance(ConfApprovalDialogActivity.this)
+                                .getRetofitClinet()
+                                .builder(ConfApi.class)
+                                .getPeopleList(s);
+                    }
+                })
                 .compose(new ListDefaultTransformer<DepartBean>())
                 .subscribe(new RxSubscriber<List<DepartBean>>() {
-                               @Override
-                               public void onSuccess(List<DepartBean> departments) {
-                                   // 根据得到的参会人员列表departments设置右边的数据
-                                   Log.i("TAG", departments.toString());
-                                   maps = new HashMap<>();
-                                   org1Names = new ArrayList<>();
-                                   //Toast.makeText(NewConfActivity.this, departments.size() + "", Toast.LENGTH_SHORT).show();
-                                   //Log.i("TAG",departments.toString());
-                                   hisEmployee.clear();
-                                   for (int i = 0; i < departments.size(); i++) {
-                                       String[] strName = departments.get(i).getEmployeeName().split(",");
-                                       String[] strId = departments.get(i).getEmployeeId().split(",");
-                                       String orgName = departments.get(i).getDeptName();
-                                       for (int j = 0; j < strName.length; j++) {
-                                           Employee employee = new Employee();
-                                           employee.setName(strName[j]);
-                                           employee.setId(strId[j]);
-                                           employee.setOrgName(orgName);
-                                           hisEmployee.add(employee);
-                                       }
-                                   }
+                    @Override
+                    public void onSuccess(List<DepartBean> departments) {
+                        //根据得到的参会人员列表departments设置右边的数据
+                        Log.i("TAG", departments.toString());
+                        maps = new HashMap<>();
+                        org1Names = new ArrayList<>();
+                        hisEmployee.clear();
+                        for (int i = 0; i < departments.size(); i++) {
+                            String[] strName = departments.get(i).getEmployeeName().split(",");
+                            String[] strId = departments.get(i).getEmployeeId().split(",");
+                            String orgName = departments.get(i).getDeptName();
+                            for (int j = 0; j < strName.length; j++) {
+                                Employee employee = new Employee(strId[j],strName[j]);
+                                employee.setName(strName[j]);
+                                employee.setId(strId[j]);
+                                employee.setOrgName(orgName);
+                                hisEmployee.add(employee);
+                            }
+                        }
 
-                                   maps.clear();
-                                   org1Names.clear();
-                                   for (int i = 0; i < hisEmployee.size(); i++) {
-                                       //EmployeeBean bean = new EmployeeBean();
-                                       String orgName = hisEmployee.get(i).getOrgName();
-                                       String name = hisEmployee.get(i).getName();
-                                       Employee employee = hisEmployee.get(i);
+                        maps.clear();
+                        org1Names.clear();
+                        for (int i = 0; i < hisEmployee.size(); i++) {
+                            //EmployeeBean bean = new EmployeeBean();
+                            String orgName = hisEmployee.get(i).getOrgName();
+                            String name = hisEmployee.get(i).getName();
+                            Employee employee = hisEmployee.get(i);
 
-                                       List<Employee> list = maps.get(orgName);
-                                       if (list == null) {
-                                           list = new ArrayList<>();
-                                       }
-                                       if (!list.contains(employee)) {
-                                           list.add(employee);
-                                       }
+                            List<Employee> list = maps.get(orgName);
+                            if (list == null) {
+                                list = new ArrayList<>();
+                            }
+                            if (!list.contains(employee)) {
+                                list.add(employee);
+                            }
+                            if (!maps.containsKey(orgName)) {
+                                maps.put(orgName, list);
+                            }
+                        }
 
-                                       if (!maps.containsKey(orgName)) {
-                                           maps.put(orgName, list);
-                                       }
-                                   }
+                        Set<String> set = maps.keySet();
+                        Iterator<String> iterator = set.iterator();
+                        for (int i = 0; i < maps.size(); i++) {
+                            String key = iterator.next();
+                            if (!org1Names.contains(key)) {
+                                org1Names.add(key);
+                            }
+                            List<Employee> values = maps.get(key);
+                        }
+                    }
 
-                                   Set<String> set = maps.keySet();
-                                   Iterator<String> iterator = set.iterator();
-                                   for (int i = 0; i < maps.size(); i++) {
-                                       String key = iterator.next();
-                                       if (!org1Names.contains(key)) {
-                                           org1Names.add(key);
-                                       }
-                                       List<Employee> values = maps.get(key);
-                                   }
-                               }
-
-                               @Override
-                               protected void onError(ResponeThrowable responeThrowable) {
-                                   Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
-
-                               }
-                           }
-//                        departments -> {
-//
-//                        }, responeThrowable -> {
-//                            Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
-//                        }
-                );
+                    @Override
+                    protected void onError(ResponeThrowable responeThrowable) {
+                        Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

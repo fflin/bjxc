@@ -141,7 +141,6 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
 
         //初始化recyclerview
         initRefresh();
-        //TODO 正式使用时取消注释
         refreshLayout.startRefresh();
     }
 
