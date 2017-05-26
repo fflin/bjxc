@@ -87,7 +87,217 @@ public class ConfBean implements Serializable {
 
     public boolean isVegetarian;//收缩
 
-//    public String select;//复选框是否选中
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ConfBean confBean = (ConfBean) o;
+
+        if (id != null ? !id.equals(confBean.id) : confBean.id != null) return false;
+        if (smcConfId != null ? !smcConfId.equals(confBean.smcConfId) : confBean.smcConfId != null)
+            return false;
+        if (beginTime != null ? !beginTime.equals(confBean.beginTime) : confBean.beginTime != null)
+            return false;
+        if (factBeginTime != null ? !factBeginTime.equals(confBean.factBeginTime) : confBean.factBeginTime != null)
+            return false;
+        if (endTime != null ? !endTime.equals(confBean.endTime) : confBean.endTime != null)
+            return false;
+        if (factEndTime != null ? !factEndTime.equals(confBean.factEndTime) : confBean.factEndTime != null)
+            return false;
+        if (schedulingTime != null ? !schedulingTime.equals(confBean.schedulingTime) : confBean.schedulingTime != null)
+            return false;
+        if (duration != null ? !duration.equals(confBean.duration) : confBean.duration != null)
+            return false;
+        if (createTime != null ? !createTime.equals(confBean.createTime) : confBean.createTime != null)
+            return false;
+        if (name != null ? !name.equals(confBean.name) : confBean.name != null) return false;
+        if (peopleIdOa != null ? !peopleIdOa.equals(confBean.peopleIdOa) : confBean.peopleIdOa != null)
+            return false;
+        if (applyPeople != null ? !applyPeople.equals(confBean.applyPeople) : confBean.applyPeople != null)
+            return false;
+        if (deptId != null ? !deptId.equals(confBean.deptId) : confBean.deptId != null)
+            return false;
+        if (applyDept != null ? !applyDept.equals(confBean.applyDept) : confBean.applyDept != null)
+            return false;
+        if (unitId != null ? !unitId.equals(confBean.unitId) : confBean.unitId != null)
+            return false;
+        if (unit != null ? !unit.equals(confBean.unit) : confBean.unit != null) return false;
+        if (unitIdName != null ? !unitIdName.equals(confBean.unitIdName) : confBean.unitIdName != null)
+            return false;
+        if (oneArea != null ? !oneArea.equals(confBean.oneArea) : confBean.oneArea != null)
+            return false;
+        if (twoArea != null ? !twoArea.equals(confBean.twoArea) : confBean.twoArea != null)
+            return false;
+        if (threeArea != null ? !threeArea.equals(confBean.threeArea) : confBean.threeArea != null)
+            return false;
+        if (fourArea != null ? !fourArea.equals(confBean.fourArea) : confBean.fourArea != null)
+            return false;
+        if (confType != null ? !confType.equals(confBean.confType) : confBean.confType != null)
+            return false;
+        if (confState != null ? !confState.equals(confBean.confState) : confBean.confState != null)
+            return false;
+        if (confMode != null ? !confMode.equals(confBean.confMode) : confBean.confMode != null)
+            return false;
+        if (confRange != null ? !confRange.equals(confBean.confRange) : confBean.confRange != null)
+            return false;
+        if (remarks != null ? !remarks.equals(confBean.remarks) : confBean.remarks != null)
+            return false;
+        if (vetos != null ? !vetos.equals(confBean.vetos) : confBean.vetos != null) return false;
+        if (checkPeopleIdOa != null ? !checkPeopleIdOa.equals(confBean.checkPeopleIdOa) : confBean.checkPeopleIdOa != null)
+            return false;
+        if (checkPeople != null ? !checkPeople.equals(confBean.checkPeople) : confBean.checkPeople != null)
+            return false;
+        if (checkTime != null ? !checkTime.equals(confBean.checkTime) : confBean.checkTime != null)
+            return false;
+        if (staffCount != null ? !staffCount.equals(confBean.staffCount) : confBean.staffCount != null)
+            return false;
+        if (siteCount != null ? !siteCount.equals(confBean.siteCount) : confBean.siteCount != null)
+            return false;
+        if (state != null ? !state.equals(confBean.state) : confBean.state != null) return false;
+        if (isEmail != null ? !isEmail.equals(confBean.isEmail) : confBean.isEmail != null)
+            return false;
+        if (isSms != null ? !isSms.equals(confBean.isSms) : confBean.isSms != null) return false;
+        if (emailId != null ? !emailId.equals(confBean.emailId) : confBean.emailId != null)
+            return false;
+        if (emailTitle != null ? !emailTitle.equals(confBean.emailTitle) : confBean.emailTitle != null)
+            return false;
+        if (emailContext != null ? !emailContext.equals(confBean.emailContext) : confBean.emailContext != null)
+            return false;
+        if (smsId != null ? !smsId.equals(confBean.smsId) : confBean.smsId != null) return false;
+        if (smsTitle != null ? !smsTitle.equals(confBean.smsTitle) : confBean.smsTitle != null)
+            return false;
+        if (smsContext != null ? !smsContext.equals(confBean.smsContext) : confBean.smsContext != null)
+            return false;
+        if (isFirst != null ? !isFirst.equals(confBean.isFirst) : confBean.isFirst != null)
+            return false;
+        if (confExplain != null ? !confExplain.equals(confBean.confExplain) : confBean.confExplain != null)
+            return false;
+        if (confParameters != null ? !confParameters.equals(confBean.confParameters) : confBean.confParameters != null)
+            return false;
+        if (accessCode != null ? !accessCode.equals(confBean.accessCode) : confBean.accessCode != null)
+            return false;
+        if (password != null ? !password.equals(confBean.password) : confBean.password != null)
+            return false;
+        if (mediaEncrypptType != null ? !mediaEncrypptType.equals(confBean.mediaEncrypptType) : confBean.mediaEncrypptType != null)
+            return false;
+        if (auxVideoFormat != null ? !auxVideoFormat.equals(confBean.auxVideoFormat) : confBean.auxVideoFormat != null)
+            return false;
+        if (auxVideoProtocol != null ? !auxVideoProtocol.equals(confBean.auxVideoProtocol) : confBean.auxVideoProtocol != null)
+            return false;
+        if (cpResouce != null ? !cpResouce.equals(confBean.cpResouce) : confBean.cpResouce != null)
+            return false;
+        if (rate != null ? !rate.equals(confBean.rate) : confBean.rate != null) return false;
+        if (isRecording != null ? !isRecording.equals(confBean.isRecording) : confBean.isRecording != null)
+            return false;
+        if (recorderAddr != null ? !recorderAddr.equals(confBean.recorderAddr) : confBean.recorderAddr != null)
+            return false;
+        if (isLiveBroadcast != null ? !isLiveBroadcast.equals(confBean.isLiveBroadcast) : confBean.isLiveBroadcast != null)
+            return false;
+        if (presentation != null ? !presentation.equals(confBean.presentation) : confBean.presentation != null)
+            return false;
+        if (chairmanPassword != null ? !chairmanPassword.equals(confBean.chairmanPassword) : confBean.chairmanPassword != null)
+            return false;
+        if (billCode != null ? !billCode.equals(confBean.billCode) : confBean.billCode != null)
+            return false;
+        if (confException != null ? !confException.equals(confBean.confException) : confBean.confException != null)
+            return false;
+        if (isKeepSecret != null ? !isKeepSecret.equals(confBean.isKeepSecret) : confBean.isKeepSecret != null)
+            return false;
+        if (departPath != null ? !departPath.equals(confBean.departPath) : confBean.departPath != null)
+            return false;
+        if (errorCode != null ? !errorCode.equals(confBean.errorCode) : confBean.errorCode != null)
+            return false;
+        if (cancelConfExplain != null ? !cancelConfExplain.equals(confBean.cancelConfExplain) : confBean.cancelConfExplain != null)
+            return false;
+        if (parentId != null ? !parentId.equals(confBean.parentId) : confBean.parentId != null)
+            return false;
+        if (contactPeople != null ? !contactPeople.equals(confBean.contactPeople) : confBean.contactPeople != null)
+            return false;
+        if (contactTelephone != null ? !contactTelephone.equals(confBean.contactTelephone) : confBean.contactTelephone != null)
+            return false;
+        if (organizer != null ? !organizer.equals(confBean.organizer) : confBean.organizer != null)
+            return false;
+        if (deviceNumber != null ? !deviceNumber.equals(confBean.deviceNumber) : confBean.deviceNumber != null)
+            return false;
+        return deviceName != null ? deviceName.equals(confBean.deviceName) : confBean.deviceName == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (smcConfId != null ? smcConfId.hashCode() : 0);
+        result = 31 * result + (beginTime != null ? beginTime.hashCode() : 0);
+        result = 31 * result + (factBeginTime != null ? factBeginTime.hashCode() : 0);
+        result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
+        result = 31 * result + (factEndTime != null ? factEndTime.hashCode() : 0);
+        result = 31 * result + (schedulingTime != null ? schedulingTime.hashCode() : 0);
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (peopleIdOa != null ? peopleIdOa.hashCode() : 0);
+        result = 31 * result + (applyPeople != null ? applyPeople.hashCode() : 0);
+        result = 31 * result + (deptId != null ? deptId.hashCode() : 0);
+        result = 31 * result + (applyDept != null ? applyDept.hashCode() : 0);
+        result = 31 * result + (unitId != null ? unitId.hashCode() : 0);
+        result = 31 * result + (unit != null ? unit.hashCode() : 0);
+        result = 31 * result + (unitIdName != null ? unitIdName.hashCode() : 0);
+        result = 31 * result + (oneArea != null ? oneArea.hashCode() : 0);
+        result = 31 * result + (twoArea != null ? twoArea.hashCode() : 0);
+        result = 31 * result + (threeArea != null ? threeArea.hashCode() : 0);
+        result = 31 * result + (fourArea != null ? fourArea.hashCode() : 0);
+        result = 31 * result + (confType != null ? confType.hashCode() : 0);
+        result = 31 * result + (confState != null ? confState.hashCode() : 0);
+        result = 31 * result + (confMode != null ? confMode.hashCode() : 0);
+        result = 31 * result + (confRange != null ? confRange.hashCode() : 0);
+        result = 31 * result + (remarks != null ? remarks.hashCode() : 0);
+        result = 31 * result + (vetos != null ? vetos.hashCode() : 0);
+        result = 31 * result + (checkPeopleIdOa != null ? checkPeopleIdOa.hashCode() : 0);
+        result = 31 * result + (checkPeople != null ? checkPeople.hashCode() : 0);
+        result = 31 * result + (checkTime != null ? checkTime.hashCode() : 0);
+        result = 31 * result + (staffCount != null ? staffCount.hashCode() : 0);
+        result = 31 * result + (siteCount != null ? siteCount.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (isEmail != null ? isEmail.hashCode() : 0);
+        result = 31 * result + (isSms != null ? isSms.hashCode() : 0);
+        result = 31 * result + (emailId != null ? emailId.hashCode() : 0);
+        result = 31 * result + (emailTitle != null ? emailTitle.hashCode() : 0);
+        result = 31 * result + (emailContext != null ? emailContext.hashCode() : 0);
+        result = 31 * result + (smsId != null ? smsId.hashCode() : 0);
+        result = 31 * result + (smsTitle != null ? smsTitle.hashCode() : 0);
+        result = 31 * result + (smsContext != null ? smsContext.hashCode() : 0);
+        result = 31 * result + (isFirst != null ? isFirst.hashCode() : 0);
+        result = 31 * result + (confExplain != null ? confExplain.hashCode() : 0);
+        result = 31 * result + (confParameters != null ? confParameters.hashCode() : 0);
+        result = 31 * result + (accessCode != null ? accessCode.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (mediaEncrypptType != null ? mediaEncrypptType.hashCode() : 0);
+        result = 31 * result + (auxVideoFormat != null ? auxVideoFormat.hashCode() : 0);
+        result = 31 * result + (auxVideoProtocol != null ? auxVideoProtocol.hashCode() : 0);
+        result = 31 * result + (cpResouce != null ? cpResouce.hashCode() : 0);
+        result = 31 * result + (rate != null ? rate.hashCode() : 0);
+        result = 31 * result + (isRecording != null ? isRecording.hashCode() : 0);
+        result = 31 * result + (recorderAddr != null ? recorderAddr.hashCode() : 0);
+        result = 31 * result + (isLiveBroadcast != null ? isLiveBroadcast.hashCode() : 0);
+        result = 31 * result + (presentation != null ? presentation.hashCode() : 0);
+        result = 31 * result + (chairmanPassword != null ? chairmanPassword.hashCode() : 0);
+        result = 31 * result + (billCode != null ? billCode.hashCode() : 0);
+        result = 31 * result + (confException != null ? confException.hashCode() : 0);
+        result = 31 * result + (isKeepSecret != null ? isKeepSecret.hashCode() : 0);
+        result = 31 * result + (departPath != null ? departPath.hashCode() : 0);
+        result = 31 * result + (errorCode != null ? errorCode.hashCode() : 0);
+        result = 31 * result + (cancelConfExplain != null ? cancelConfExplain.hashCode() : 0);
+        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
+        result = 31 * result + (contactPeople != null ? contactPeople.hashCode() : 0);
+        result = 31 * result + (contactTelephone != null ? contactTelephone.hashCode() : 0);
+        result = 31 * result + (organizer != null ? organizer.hashCode() : 0);
+        result = 31 * result + (deviceNumber != null ? deviceNumber.hashCode() : 0);
+        result = 31 * result + (deviceName != null ? deviceName.hashCode() : 0);
+        return result;
+    }
+
+    //    public String select;//复选框是否选中
 
 //    // Fields
 //    private Integer id;//id

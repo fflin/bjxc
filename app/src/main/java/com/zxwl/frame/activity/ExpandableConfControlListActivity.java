@@ -58,13 +58,14 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
     /*列表刷新-start*/
     private TwinklingRefreshLayout refreshLayout;
     private RecyclerView rvList;
-    private int PAGE_SIZE = 10;
+    private int PAGE_SIZE = 3;
     private int PAGE_NUM = 0;
     private ExpandableConfControlAdapter adapter;
     private List<ConfBeanParent> list = new ArrayList<>();
     /*列表刷新-end*/
 
     private Subscription subscribe;
+    private boolean enableLoadmore = true;//加载更多是否可用
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ExpandableConfControlListActivity.class));
@@ -237,9 +238,41 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                 new Func2<DataList<ConfBean>, DataList<ConfBean>, List<ConfBeanParent>>() {
                     @Override
                     public List<ConfBeanParent> call(DataList<ConfBean> beingConfList, DataList<ConfBean> waitConfList) {
+                        List<ConfBeanParent> parentList = adapter.getParentList();
                         List<ConfBeanParent> newList = new ArrayList<ConfBeanParent>();
-                        newList.add(new ConfBeanParent("正在召开的会议(" + beingConfList.dataList.size() + ")", beingConfList.dataList));
-                        newList.add(new ConfBeanParent("预约会议(" + waitConfList.dataList.size() + ")", waitConfList.dataList));
+
+                        if (1 == pageNum) {
+                            parentList.clear();
+                            newList.add(new ConfBeanParent("正在召开的会议(" + beingConfList.dataList.size() + ")", beingConfList.dataList));
+                            newList.add(new ConfBeanParent("预约会议(" + waitConfList.dataList.size() + ")", waitConfList.dataList));
+                        } else {//加载更多
+                            //获得之前列表里的数据
+                            List<ConfBean> beingList = parentList.get(0).getChildList();
+                            List<ConfBean> waitList = parentList.get(1).getChildList();
+                            //判断正在召开的会议是否重复
+                            for (int i = 0; i < beingConfList.dataList.size(); i++) {
+                                if (!beingList.contains(beingConfList.dataList.get(i))) {
+                                    beingList.add(beingConfList.dataList.get(i));
+                                }
+                            }
+
+                            //判断预约的会议是否重复
+                            for (int i = 0; i < waitConfList.dataList.size(); i++) {
+                                if (!waitList.contains(waitConfList.dataList.get(i))) {
+                                    waitList.add(waitConfList.dataList.get(i));
+                                }
+                            }
+
+                            //添加到返回的新列表当中
+                            newList.add(new ConfBeanParent("正在召开的会议(" + beingList.size() + ")", beingList));
+                            newList.add(new ConfBeanParent("预约会议(" + waitList.size() + ")", waitList));
+
+                            //如果当前条数大于或等于总条数则禁用加载更多
+                            if (beingList.size() >= Integer.parseInt(beingConfList.rowSum) &&
+                                    waitList.size() >= Integer.parseInt(waitConfList.rowSum)) {
+                                enableLoadmore = false;
+                            }
+                        }
                         return newList;
                     }
                 })
@@ -249,15 +282,26 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                 .subscribe(new RxSubscriber<List<ConfBeanParent>>() {
                     @Override
                     public void onSuccess(List<ConfBeanParent> confBeanParents) {
-                        //清除之前的数据
-                        //结束刷新
-                        refreshLayout.finishRefreshing();
+                        //1为刷新，否则为加载更多
+                        if (1 == pageNum) {
+                            PAGE_NUM = 1;
+                            refreshLayout.finishRefreshing();
+                            //刷新的时候设置加载更多可以使用
+                            refreshLayout.setEnableLoadmore(true);
+                            enableLoadmore = true;
+                            Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
+                        } else {
+                            PAGE_NUM++;
+                            refreshLayout.finishLoadmore();
+                            //根据设置的值判断加载更多是否可用
+                            refreshLayout.setEnableLoadmore(enableLoadmore);
+                            Toast.makeText(ExpandableConfControlListActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+                        }
+
                         list.clear();
-                        //刷新适配器
                         list.addAll(confBeanParents);
                         adapter.setResetFalg(true);
                         adapter.notifyParentDataSetChanged(true);
-                        Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -265,71 +309,6 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                         Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
                     }
                 });
-
-        //        HttpUtils.getInstance(this)
-//                .getRetofitClinet()
-//                .builder(ConfApi.class)
-//                .getConfBeinglList(PAGE_SIZE, pageNum)
-//                .compose(this.<DataList<ConfBean>>bindToLifecycle())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(
-//                        result -> {
-//                            //成功则代表请求到数据
-//                            if (null != result.dataList) {
-////                                && result.dataList.size() > 0
-//                                //给所有的bean添加状态
-//                                for (int i = 0, count = result.dataList.size(); i < count; i++) {
-//                                    result.dataList.get(i).showControl = false;
-//                                }
-//
-//                                //1为刷新，否则为加载更多
-//                                if (1 == pageNum) {
-//                                    PAGE_NUM = 1;
-//                                    list.clear();
-//                                    list.addAll(result.dataList);
-//                                    refreshLayout.finishRefreshing();
-//                                    //刷新的时候设置加载更多可以使用
-//                                    refreshLayout.setEnableLoadmore(true);
-//                                    Toast.makeText(ExpandableConfControlListActivity.this, "刷新成功", Toast.LENGTH_SHORT).show();
-//                                } else {
-//                                    PAGE_NUM++;
-//                                    list.addAll(result.dataList);
-//                                    refreshLayout.finishLoadmore();
-//                                    Toast.makeText(ExpandableConfControlListActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
-//                                }
-//
-//                                //刷新适配器
-//                                adapter.notifyDataSetChanged();
-//
-//                                //如果当前条数大于或等于总条数则禁用加载更多
-//                                if (list.size() >= Integer.parseInt(result.rowSum)) {
-//                                    refreshLayout.setEnableLoadmore(false);
-//                                }
-//                            } else {
-//                                if (1 == pageNum) {
-//                                    //清空所有数据
-//                                    list.clear();
-//                                    //根据样式刷新布局
-//                                    adapter.notifyDataSetChanged();
-//                                    Toast.makeText(ExpandableConfControlListActivity.this, "当前没有会议", Toast.LENGTH_SHORT).show();
-//                                    refreshLayout.finishRefreshing();
-//                                } else {
-//                                    Toast.makeText(ExpandableConfControlListActivity.this, "当前没有更多会议", Toast.LENGTH_SHORT).show();
-//                                    refreshLayout.finishLoadmore();
-//                                }
-//                            }
-//                        },
-//                        //产生异常
-//                        responeThrowable -> {
-//                            Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
-//                            if (1 == pageNum) {
-//                                refreshLayout.finishRefreshing();
-//                            } else {
-//                                refreshLayout.finishLoadmore();
-//                            }
-//                        }
-//                );
     }
 
     /**

@@ -308,61 +308,72 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
                         }
                 )
                 .compose(new ListDefaultTransformer<DepartBean>())
-                .subscribe(
-                        departments -> {
-                            // 根据得到的参会人员列表departments设置右边的数据
-                            Log.i("TAG", departments.toString());
-                            maps = new HashMap<>();
-                            org1Names = new ArrayList<>();
-                            //Toast.makeText(NewConfActivity.this, departments.size() + "", Toast.LENGTH_SHORT).show();
-                            //Log.i("TAG",departments.toString());
-                            hisEmployee.clear();
-                            for (int i = 0; i < departments.size(); i++) {
-                                String[] strName = departments.get(i).getEmployeeName().split(",");
-                                String[] strId = departments.get(i).getEmployeeId().split(",");
-                                String orgName = departments.get(i).getDeptName();
-                                for (int j = 0; j < strName.length; j++) {
-                                    Employee employee = new Employee();
-                                    employee.setName(strName[j]);
-                                    employee.setId(strId[j]);
-                                    employee.setOrgName(orgName);
-                                    hisEmployee.add(employee);
-                                }
-                            }
+                .subscribe(new RxSubscriber<List<DepartBean>>() {
+                               @Override
+                               public void onSuccess(List<DepartBean> departments) {
+                                   // 根据得到的参会人员列表departments设置右边的数据
+                                   Log.i("TAG", departments.toString());
+                                   maps = new HashMap<>();
+                                   org1Names = new ArrayList<>();
+                                   //Toast.makeText(NewConfActivity.this, departments.size() + "", Toast.LENGTH_SHORT).show();
+                                   //Log.i("TAG",departments.toString());
+                                   hisEmployee.clear();
+                                   for (int i = 0; i < departments.size(); i++) {
+                                       String[] strName = departments.get(i).getEmployeeName().split(",");
+                                       String[] strId = departments.get(i).getEmployeeId().split(",");
+                                       String orgName = departments.get(i).getDeptName();
+                                       for (int j = 0; j < strName.length; j++) {
+                                           Employee employee = new Employee();
+                                           employee.setName(strName[j]);
+                                           employee.setId(strId[j]);
+                                           employee.setOrgName(orgName);
+                                           hisEmployee.add(employee);
+                                       }
+                                   }
 
-                            maps.clear();
-                            org1Names.clear();
-                            for (int i = 0; i < hisEmployee.size(); i++) {
-                                //EmployeeBean bean = new EmployeeBean();
-                                String orgName = hisEmployee.get(i).getOrgName();
-                                String name = hisEmployee.get(i).getName();
-                                Employee employee = hisEmployee.get(i);
+                                   maps.clear();
+                                   org1Names.clear();
+                                   for (int i = 0; i < hisEmployee.size(); i++) {
+                                       //EmployeeBean bean = new EmployeeBean();
+                                       String orgName = hisEmployee.get(i).getOrgName();
+                                       String name = hisEmployee.get(i).getName();
+                                       Employee employee = hisEmployee.get(i);
 
-                                List<Employee> list = maps.get(orgName);
-                                if (list == null) {
-                                    list = new ArrayList<>();
-                                }
-                                if (!list.contains(employee)) {
-                                    list.add(employee);
-                                }
+                                       List<Employee> list = maps.get(orgName);
+                                       if (list == null) {
+                                           list = new ArrayList<>();
+                                       }
+                                       if (!list.contains(employee)) {
+                                           list.add(employee);
+                                       }
 
-                                if (!maps.containsKey(orgName)) {
-                                    maps.put(orgName, list);
-                                }
-                            }
+                                       if (!maps.containsKey(orgName)) {
+                                           maps.put(orgName, list);
+                                       }
+                                   }
 
-                            Set<String> set = maps.keySet();
-                            Iterator<String> iterator = set.iterator();
-                            for (int i = 0; i < maps.size(); i++) {
-                                String key = iterator.next();
-                                if (!org1Names.contains(key)) {
-                                    org1Names.add(key);
-                                }
-                                List<Employee> values = maps.get(key);
-                            }
-                        }, responeThrowable -> {
-                            Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
-                        }
+                                   Set<String> set = maps.keySet();
+                                   Iterator<String> iterator = set.iterator();
+                                   for (int i = 0; i < maps.size(); i++) {
+                                       String key = iterator.next();
+                                       if (!org1Names.contains(key)) {
+                                           org1Names.add(key);
+                                       }
+                                       List<Employee> values = maps.get(key);
+                                   }
+                               }
+
+                               @Override
+                               protected void onError(ResponeThrowable responeThrowable) {
+                                   Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
+
+                               }
+                           }
+//                        departments -> {
+//
+//                        }, responeThrowable -> {
+//                            Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
+//                        }
                 );
     }
 }

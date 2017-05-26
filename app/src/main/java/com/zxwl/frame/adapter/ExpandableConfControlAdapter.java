@@ -51,6 +51,14 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
      */
     public ExpandableConfControlAdapter(@NonNull List<ConfBeanParent> parentList) {
         super(parentList);
+        this.parentList = parentList;
+    }
+
+    private List<ConfBeanParent> parentList;
+
+    public void addAll(List<ConfBeanParent> confBeanParents) {
+        parentList.addAll(confBeanParents);
+
     }
 
     @NonNull

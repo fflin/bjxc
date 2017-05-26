@@ -1,9 +1,11 @@
 package com.zxwl.frame.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,10 +14,12 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.zxwl.frame.App;
 import com.zxwl.frame.AppManager;
 import com.zxwl.frame.R;
 import com.zxwl.frame.bean.UserInfo;
 import com.zxwl.frame.constant.Account;
+import com.zxwl.frame.utils.ACache;
 import com.zxwl.frame.utils.UserHelper;
 import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 
@@ -37,6 +41,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
      * 判断是否已经点击过一次回退键
      */
     private boolean isBackPressed = false;
+    private ACache mCache;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, HomeActivity.class));
@@ -56,6 +61,9 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void initData() {
+
+        judgePower();
+
         tvLogOut.setVisibility(View.VISIBLE);
         tvIssue.setVisibility(View.VISIBLE);
         tvHome.setVisibility(View.VISIBLE);
@@ -63,6 +71,38 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
 
         if (null != UserHelper.getSavedUser()) {
             tvName.setText(UserHelper.getSavedUser().name);
+        }
+    }
+
+    /**
+     * TODO 后期需要删除
+     * 判断权限,如果权限过期则不可用
+     */
+    private void judgePower() {
+        mCache = ACache.get(App.getInstance());
+        //获得缓存的对象
+        String asString = mCache.getAsString(Account.LOGIN_TIME);
+        //判断是否存在这个值
+        if (TextUtils.isEmpty(asString)) {
+            new MaterialDialog.Builder(HomeActivity.this)
+                    .title("提示")
+                    .content("授权已过期,如需使用,请联系中讯网联")
+                    .positiveText("确认")
+                    .dismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            finish();
+                            AppManager.getInstance().appExit();
+                        }
+                    })
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .build()
+                    .show();
         }
     }
 

@@ -1,16 +1,13 @@
 package com.zxwl.frame.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.zxwl.frame.App;
 import com.zxwl.frame.R;
@@ -60,34 +57,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         etPwd.setText(PreferencesHelper.getData(Account.LOGIN_PWD));
 
         mCache = ACache.get(App.getInstance());
-
-        //首先判断是否登录过
-        String data = PreferencesHelper.getData(Account.IS_LOGIN);
-
-        if (!TextUtils.isEmpty(data)) {
-            //创建缓存的对象
-            String asString = mCache.getAsString(Account.LOGIN_TIME);
-            if (TextUtils.isEmpty(asString)) {
-                new MaterialDialog.Builder(this)
-                        .title("提示")
-                        .content("授权已过期,如需使用,请联系中讯网联")
-                        .positiveText("确认")
-                        .dismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                finish();
-                            }
-                        })
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .build()
-                        .show();
-            }
-        }
     }
 
     @Override
@@ -192,15 +161,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 }
 
                                 //保存登录信息,信息过期软件不可用
-//                                mCache.put(Account.LOGIN_TIME, "true", 2 * ACache.TIME_DAY);
-                                mCache.put(Account.LOGIN_TIME, "true", 10);
+                                mCache.put(Account.LOGIN_TIME, "true", 7 * ACache.TIME_DAY);
+//                                mCache.put(Account.LOGIN_TIME, "true", 30);
                             }
 
                             @Override
                             protected void onError(ResponeThrowable responeThrowable) {
                                 dialog.dismiss();
                                 Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
-
                             }
                         }
 //                        //成功操作
