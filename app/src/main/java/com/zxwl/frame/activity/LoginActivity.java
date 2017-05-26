@@ -161,8 +161,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 }
 
                                 //保存登录信息,信息过期软件不可用
-                                mCache.put(Account.LOGIN_TIME, "true", 7 * ACache.TIME_DAY);
-//                                mCache.put(Account.LOGIN_TIME, "true", 30);
+                                String asString = mCache.getAsString(Account.LOGIN_TIME);
+                                //如果为空则代表没有登录成功过,没有纪录过权限数据,所以需要纪录
+                                if (TextUtils.isEmpty(asString)) {
+                                    mCache.put(Account.LOGIN_TIME, "true", 7 * ACache.TIME_DAY);
+                                    mCache.put(Account.LOGIN_TIME, "true", ACache.TIME_DAY);
+                                }
                             }
 
                             @Override

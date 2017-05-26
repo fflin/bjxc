@@ -349,7 +349,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //保存
             case R.id.tv_save:
-                if (TextUtils.isEmpty(contactList)) {
+                if (TextUtils.isEmpty(contactList) && expAdapter.getMapV().hasNext()) {
                     String unitIdName = "_TN_C";
                     StringBuilder sbUnitName = new StringBuilder();
                     StringBuilder sbDeviceName = new StringBuilder();
@@ -366,7 +366,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     }
                 }
 
-                //设备名称
+                //参会列表
                 if (TextUtils.isEmpty(contactList)) {
                     Toast.makeText(this, "请选择参会列表", Toast.LENGTH_SHORT).show();
                     return;
