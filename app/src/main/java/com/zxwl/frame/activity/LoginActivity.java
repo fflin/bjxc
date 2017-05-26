@@ -164,7 +164,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 String asString = mCache.getAsString(Account.LOGIN_TIME);
                                 //如果为空则代表没有登录成功过,没有纪录过权限数据,所以需要纪录
                                 if (TextUtils.isEmpty(asString)) {
-                                    mCache.put(Account.LOGIN_TIME, "true", 7 * ACache.TIME_DAY);
+//                                    mCache.put(Account.LOGIN_TIME, "true", 7 * ACache.TIME_DAY);
                                     mCache.put(Account.LOGIN_TIME, "true", ACache.TIME_DAY);
                                 }
                             }

@@ -228,7 +228,9 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         tvIssue.setVisibility(View.VISIBLE);
         tvHome.setVisibility(View.VISIBLE);
         tvName.setVisibility(View.VISIBLE);
-        tvName.setText(UserHelper.getSavedUser().name);
+        if(null!=UserHelper.getSavedUser()){
+            tvName.setText(UserHelper.getSavedUser().name);
+        }
 
         reSMSContent.setEnabled(false);
         reSMSContent.setOnTouchListener(new View.OnTouchListener() {
