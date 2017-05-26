@@ -1227,6 +1227,12 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
      */
     private void setConfContent(ConfBean confBean) {
         if (null == confBean) {
+            //短信内容
+            smsContent = "";
+            smsTitle = "";
+            smsId = "";
+            //参会列表
+            contactList = "";
             etName.setText("");//会议名称
             etContactsName.setText("");//联系人
             etPhone.setText("");//联系电话
@@ -1237,7 +1243,10 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
             tvDuration.setText("");//会议时长
             etEmail.setText("");//邮件内容
             reSMSContent.setHtml("");//短信内容
-            expAdapter.remove();
+            //清空参会列表
+            if (null != expAdapter) {
+                expAdapter.remove();
+            }
             return;
         }
         smsTitle = confBean.smsTitle; //短信标题

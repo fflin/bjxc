@@ -28,11 +28,10 @@
 
         <ImageView
             android:id="@+id/iv_close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:padding="8dp"
             android:src="@mipmap/icon_arrow_back"/>
     </RelativeLayout>
 
@@ -70,7 +69,6 @@
         android:layout_below="@id/rl_edit"
         android:background="#FFFFFF"
         android:divider="@null"
-        android:groupIndicator="@null">
+        android:groupIndicator="@null"/>
 
-    </ExpandableListView>
 </RelativeLayout>

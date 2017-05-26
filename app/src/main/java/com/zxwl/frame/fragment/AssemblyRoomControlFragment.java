@@ -144,7 +144,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
                         new Action1<ConfirmEvent>() {
                             @Override
                             public void call(ConfirmEvent confirmEvent) {
-                                Toast.makeText(mContext, "会场控制选择了"+confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "会场控制选择了" + confirmEvent.data.size(), Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
@@ -317,14 +317,14 @@ public class AssemblyRoomControlFragment extends BaseFragment {
                                 Logger.i(s3);
                                 siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {
                                 }.getType());
-
+                                //设置
                                 for (int i = 0, count = siteList.size(); i < count; i++) {
                                     siteList.get(i).showRemoveControl = false;
                                 }
 
                                 //刷新适配器
                                 adapter.addAll(siteList);
-
+                                //设置会议名称
                                 tvTitle.setText(conferenceStatus.name);
                                 if (siteList.size() > 0) {
                                     Site site = siteList.get(0);
@@ -332,7 +332,6 @@ public class AssemblyRoomControlFragment extends BaseFragment {
                                 }
                                 //设置控件的事件
                                 setListener();
-
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
