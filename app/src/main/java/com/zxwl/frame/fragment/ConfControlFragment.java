@@ -88,15 +88,17 @@ public class ConfControlFragment extends BaseFragment {
     private int chairIndex = -1;//主席会场的下标
     private int broadcastIndex = -1;//广播会场的下标
     private Subscription subscribe;
+    private String operatorId;
 
     public ConfControlFragment() {
     }
 
-    public static ConfControlFragment newInstance(String smcConfId, String confId) {
+    public static ConfControlFragment newInstance(String smcConfId, String confId, String operatorId) {
         ConfControlFragment fragment = new ConfControlFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ConfControlActivity.SMC_CONF_ID, smcConfId);
         bundle.putString(ConfControlActivity.CONF_ID, confId);
+        bundle.putString(ConfControlActivity.OPERATOR_ID, operatorId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -129,6 +131,8 @@ public class ConfControlFragment extends BaseFragment {
         Bundle arguments = getArguments();
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
         confId = (String) arguments.get(ConfControlActivity.CONF_ID);
+        operatorId = (String) arguments.get(ConfControlActivity.OPERATOR_ID);
+
 
         initRefresh();
 
@@ -399,7 +403,7 @@ public class ConfControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .delSiteFromConf(smcConfId, confId, siteUris)
+                .delSiteFromConf(smcConfId, confId, siteUris, operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -428,7 +432,7 @@ public class ConfControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .requestChair(smcConfId, siteUris)
+                .requestChair(smcConfId, siteUris, operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -458,7 +462,7 @@ public class ConfControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .releaseChair(smcConfId, siteUris)
+                .releaseChair(smcConfId, siteUris, operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -490,7 +494,7 @@ public class ConfControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .broadcastSite(smcConfId, siteUris, isBroadcast)
+                .broadcastSite(smcConfId, siteUris, isBroadcast, operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -524,7 +528,7 @@ public class ConfControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .audioSwitch(smcConfId, isSwitch)
+                .audioSwitch(smcConfId, isSwitch, operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

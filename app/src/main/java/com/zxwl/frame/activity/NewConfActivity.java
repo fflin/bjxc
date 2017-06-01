@@ -53,12 +53,14 @@ import com.zxwl.frame.utils.DateUtil;
 import com.zxwl.frame.utils.DisplayUtil;
 import com.zxwl.frame.utils.UserHelper;
 import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
+import com.zxwl.frame.views.WheelView;
 import com.zxwl.frame.views.spinner.NiceSpinner;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -113,11 +115,11 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     private TextView tvEmailTemplateLable;
     private TextView tvSmsTemplateLable;//
     private TextView tvSmsEdit;//短信编辑按钮
-    private FrameLayout flSMSContent;
+    private FrameLayout flSMSContent;//短信内容显示
     private RichEditor reSMSContent;
 
     private boolean emailNoticeFlag = false;//是否用邮件通知
-    private boolean smsNoticeFlag = true;//是否用短信通知
+    private boolean smsNoticeFlag = false;//是否用短信通知
 
     public static final String DIALOG_TYPE_HISTORY = "历史会议";
     public static final String DIALOG_TYPE_CONF_TEMPLATE = "会议模板";
@@ -181,6 +183,8 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     private boolean initConfTemplateFalg = false;//会议模板dialog创建成功
 
     private TwinklingRefreshLayout dialogRefreshLayout;
+
+    private String continueTime;//会议持续时间
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, NewConfActivity.class));
@@ -251,6 +255,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
         //获得高级参数Id
         getConfParametersList();
+        tvSmsCheck.performClick();
     }
 
     @Override
@@ -308,7 +313,10 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
             //从模板生成
             case R.id.tv_template:
                 //获得模板列表数据
-                getTemplateList();
+//                getTemplateList();
+
+                //TODO 当前修改为选择会议持续时间
+                selectContinueTime();
                 break;
 
             //从历史生成
@@ -350,7 +358,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //是否用短信发送通知
             case R.id.tv_sms_check:
-                showSMSWidget();
+//                showSMSWidget();
                 break;
 
             //显示短信编辑弹出框
@@ -397,6 +405,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     return;
                 }
 
+                /*
                 //开始时间
                 if (TextUtils.isEmpty(startTime)) {
                     Toast.makeText(this, "开始时间不能为空", Toast.LENGTH_SHORT).show();
@@ -408,6 +417,9 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     Toast.makeText(this, "结束时间不能为空", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                */
+                //会议持续时间
+                long durationTime = (endTimeLong - startTimeLong) / 1000 / 60;
 
                 //短信id
                 if (smsNoticeFlag) {
@@ -465,15 +477,34 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     return;
                 }
 
-                //会议持续时间
-                long durationTime = (endTimeLong - startTimeLong) / 1000 / 60;
                 //请求预约会议的接口
+//                saveConf(contactList,
+//                        confParametersId,
+//                        confName,
+//                        startTime,
+//                        endTime,
+//                        String.valueOf(0),
+//                        "0",
+//                        smsNoticeFlag ? "1" : "0",
+//                        smsNoticeFlag ? smsId : "",
+//                        smsNoticeFlag ? smsTitle : "",
+//                        smsNoticeFlag ? smsContent : "",
+//                        contactsName,
+//                        phone,
+//                        operatorId);
+
+                if (TextUtils.isEmpty(continueTime)) {
+                    Toast.makeText(this, "请选择会议持续时间", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //请求即时会议的接口
                 saveConf(contactList,
                         confParametersId,
                         confName,
-                        startTime,
-                        endTime,
-                        String.valueOf(durationTime),
+                        "",
+                        "",
+                        continueTime,
                         "0",
                         smsNoticeFlag ? "1" : "0",
                         smsNoticeFlag ? smsId : "",
@@ -481,8 +512,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         smsNoticeFlag ? smsContent : "",
                         contactsName,
                         phone,
-                        operatorId
-                );
+                        operatorId);
                 break;
 
             //重置
@@ -547,7 +577,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .getHistoryList(Integer.MAX_VALUE,1)
+                .getHistoryList(Integer.MAX_VALUE, 1)
                 .compose(this.<DataList<ConfBean>>bindToLifecycle())
                 .compose(new ListDefaultTransformer<ConfBean>())
                 .subscribe(new RxSubscriber<List<ConfBean>>() {
@@ -590,7 +620,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .getTemplateList(Integer.MAX_VALUE,1)
+                .getTemplateList(Integer.MAX_VALUE, 1)
                 .compose(this.<DataList<ConfBean>>bindToLifecycle())
                 .compose(new ListDefaultTransformer<ConfBean>())
                 .subscribe(new RxSubscriber<List<ConfBean>>() {
@@ -962,7 +992,8 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         params.put("conf.contactTelephone", contactTelephone);
         params.put("operatorId", operatorId);
 
-        String url = Urls.BASE_URL + Urls.CONFACTION_SAVECONF;
+//        String url = Urls.BASE_URL + Urls.CONFACTION_SAVECONF;//预约会议
+        String url = Urls.BASE_URL + Urls.SAVE_TIMELY_ENTITY;//即时会议
         OkHttpUtils
                 .post()//
                 .url(url)//
@@ -981,6 +1012,39 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         finish();
                     }
                 });
+    }
+
+    /**
+     * 选择轮询时间
+     */
+    private void selectContinueTime() {
+        View outerView = LayoutInflater.from(this).inflate(R.layout.dialog_wheel_view, null);
+        WheelView wv = (WheelView) outerView.findViewById(R.id.wheel_view_wv);
+        wv.setItems(Arrays.asList("30", "60", "90", "一直持续"));
+
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("请选择会议持续时间")
+                .customView(outerView, false)
+                .positiveText("确定")
+                .negativeText("取消")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        continueTime = wv.getSeletedItem();
+                        //如果为一直持续
+                        continueTime = "一直持续".equals(continueTime) ? "0" : continueTime;
+                        String showText = "0".equals(continueTime) ? "一直持续" : continueTime + "分钟";
+                        Toast.makeText(NewConfActivity.this, "会议持续时间为:" + showText, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .build();
+        //设置对话框的宽度
+        dialog.getWindow().setLayout(DisplayUtil.getScreenWidth() / 2, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //点击对话框以外的地方，对话框不消失
+        dialog.setCanceledOnTouchOutside(false);
+        //点击对话框意外的地方和返回键，对话框都不消失
+        //dialog.setCancelable(false);
+        dialog.show();
     }
 
     /**
@@ -1209,6 +1273,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
     /**
      * 获取到选中的employee集合
+     *
      * @param event
      */
     @Subscribe

@@ -7,11 +7,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -102,13 +99,13 @@ public class ContactBookDialogActivity extends RxAppCompatActivity implements Vi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contactbook_dialog);
-        Window window = getWindow();
-        WindowManager m = getWindowManager();
-        Display d = m.getDefaultDisplay();
-        WindowManager.LayoutParams p = window.getAttributes();
-        p.height = (int) (d.getHeight() * 0.9); // 高度设置为屏幕的0.8，根据实际情况调整
-        p.width = (int) (d.getWidth() * 0.9); // 宽度设置为屏幕的0.9，根据实际情况调整
-        window.setAttributes(p);
+//        Window window = getWindow();
+//        WindowManager m = getWindowManager();
+//        Display d = m.getDefaultDisplay();
+//        WindowManager.LayoutParams p = window.getAttributes();
+//        p.height = (int) (d.getHeight() * 0.9); // 高度设置为屏幕的0.8，根据实际情况调整
+//        p.width = (int) (d.getWidth() * 0.9); // 宽度设置为屏幕的0.9，根据实际情况调整
+//        window.setAttributes(p);
         eventBus = EventBus.getDefault();
         eventBus.register(this);
 
@@ -151,6 +148,12 @@ public class ContactBookDialogActivity extends RxAppCompatActivity implements Vi
                         selectedDepartment.addAll(allEmployee);
                         setAdapter(selectedDepartment);
                         tvNum.setText("(" + allEmployee.size() + ")");
+                        tv_employeeFailed.setVisibility(View.GONE);
+                    }
+                    if(allEmployee.size() == 0){
+                        tv_employeeFailed.setVisibility(View.VISIBLE);
+                        tv_employeeFailed.setText(getResources().getString(R.string.contact_book_nodata));
+                    }else{
                         tv_employeeFailed.setVisibility(View.GONE);
                     }
 
@@ -198,6 +201,8 @@ public class ContactBookDialogActivity extends RxAppCompatActivity implements Vi
 
             }
         });
+
+
     }
 
     //获取所有人员
@@ -246,7 +251,10 @@ public class ContactBookDialogActivity extends RxAppCompatActivity implements Vi
                                     employee.setTerminalId(object1.getString("terminalId"));
                                     employee.setOrgName(object1.getString("orgName"));
                                     employee.setTypeName(object1.getString("typeName"));
-                                    allEmployee.add(employee);
+                                    employee.setType(object1.getString("type"));
+                                    if ("1".equals(employee.getType())){
+                                        allEmployee.add(employee);
+                                    }
                                 }
 
                             } else {

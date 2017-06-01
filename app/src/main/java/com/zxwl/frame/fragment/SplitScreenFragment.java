@@ -107,15 +107,17 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     private Subscription subscription;
 
     private Gson gson = new Gson();
+    private String operatorId;
 
     public SplitScreenFragment() {
     }
 
-    public static SplitScreenFragment newInstance(String smcConfId, String confId) {
+    public static SplitScreenFragment newInstance(String smcConfId, String confId, String operatorId) {
         SplitScreenFragment fragment = new SplitScreenFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ConfControlActivity.SMC_CONF_ID, smcConfId);
         bundle.putString(ConfControlActivity.CONF_ID, confId);
+        bundle.putString(ConfControlActivity.OPERATOR_ID, operatorId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -169,6 +171,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         Bundle arguments = getArguments();
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
         confId = (String) arguments.get(ConfControlActivity.CONF_ID);
+        operatorId = (String) arguments.get(ConfControlActivity.OPERATOR_ID);
 
         //TODO 测试代码，正式环境删除
 //        Site site = null;
@@ -335,7 +338,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .setSplitScreen(smcConfId, target, presenceMode, subPics, splitScreenTime)
+                .setSplitScreen(smcConfId, target, presenceMode, subPics, splitScreenTime, operatorId)
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

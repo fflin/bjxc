@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,12 +23,14 @@ import com.zxwl.frame.adapter.ExpandableConfControlAdapter;
 import com.zxwl.frame.bean.ConfBean;
 import com.zxwl.frame.bean.ConfBeanParent;
 import com.zxwl.frame.bean.DataList;
+import com.zxwl.frame.bean.FinishConfBean;
 import com.zxwl.frame.bean.UserInfo;
 import com.zxwl.frame.constant.Account;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
 import com.zxwl.frame.net.exception.ResponeThrowable;
 import com.zxwl.frame.net.http.HttpUtils;
+import com.zxwl.frame.rx.RxBus;
 import com.zxwl.frame.utils.UserHelper;
 import com.zxwl.frame.utils.sharedpreferences.PreferencesHelper;
 import com.zxwl.frame.views.spinner.NiceSpinner;
@@ -38,6 +41,7 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
@@ -51,6 +55,8 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
     private TextView tvHome;
     private TextView tvName;
     /*头部公用控件-end*/
+
+    String operatorId = "";//操作人id
 
     private EditText etTopTitleSearch;//搜索框
     private NiceSpinner timeSpinner;//时间选择
@@ -66,6 +72,8 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
 
     private Subscription subscribe;
     private boolean enableLoadmore = true;//加载更多是否可用
+
+    private Subscription rxSubscribe;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ExpandableConfControlListActivity.class));
@@ -95,6 +103,7 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
         UserInfo userInfo = UserHelper.getSavedUser();
         if (null != userInfo) {
             tvName.setText(userInfo.name);
+            operatorId = userInfo.id;
         }
 
         //设置适配器
@@ -125,7 +134,7 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                 setAdapterShow(parentPosition, childPosition);
                 ConfBean confBean = list.get(parentPosition).getChildList().get(childPosition);
                 //控制会议
-                ConfControlActivity.startActivity(ExpandableConfControlListActivity.this, confBean.smcConfId, confBean.id);
+                ConfControlActivity.startActivity(ExpandableConfControlListActivity.this, confBean.smcConfId, confBean.id, parentPosition, childPosition);
             }
 
             @Override
@@ -142,6 +151,9 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
         //初始化recyclerview
         initRefresh();
         refreshLayout.startRefresh();
+
+        //初始化rxbus
+        initRxBus();
     }
 
     @Override
@@ -189,16 +201,41 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
         //设置头部高度
         refreshLayout.setHeaderHeight(140);
         //设置头部的最大高度
-        refreshLayout.setMaxHeadHeight(200);
+        refreshLayout.setMaxHeadHeight(150);
         //设置刷新的view
         refreshLayout.setTargetView(rvList);
+    }
+
+    private void initRxBus() {
+        rxSubscribe = RxBus.getInstance()
+                .toObserverable(FinishConfBean.class)
+                .compose(this.<FinishConfBean>bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<FinishConfBean>() {
+                            @Override
+                            public void call(FinishConfBean finishConfBean) {
+                                adapter.reomve(finishConfBean.parentPosition, finishConfBean.childPosition);
+//                                refreshLayout.startRefresh();
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                Toast.makeText(ExpandableConfControlListActivity.this, "t", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (subscribe != null && !subscribe.isUnsubscribed()) {
+        if (null != subscribe && !subscribe.isUnsubscribed()) {
             subscribe.unsubscribe();
+        }
+
+        if (null != rxSubscribe && !rxSubscribe.isUnsubscribed()) {
+            rxSubscribe.unsubscribe();
         }
     }
 
@@ -242,8 +279,8 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
 
                         if (1 == pageNum) {
                             parentList.clear();
-                            newList.add(new ConfBeanParent("正在召开的会议(" + beingConfList.dataList.size() + ")", beingConfList.dataList));
-                            newList.add(new ConfBeanParent("预约会议(" + waitConfList.dataList.size() + ")", waitConfList.dataList));
+                            newList.add(new ConfBeanParent("正在召开的会议", beingConfList.dataList.size(), beingConfList.dataList));
+                            newList.add(new ConfBeanParent("预约会议", beingConfList.dataList.size(), waitConfList.dataList));
                         } else {//加载更多
                             //获得之前列表里的数据
                             List<ConfBean> beingList = parentList.get(0).getChildList();
@@ -263,8 +300,8 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                             }
 
                             //添加到返回的新列表当中
-                            newList.add(new ConfBeanParent("正在召开的会议(" + beingList.size() + ")", beingList));
-                            newList.add(new ConfBeanParent("预约会议(" + waitList.size() + ")", waitList));
+                            newList.add(new ConfBeanParent("正在召开的会议", beingList.size(), beingList));
+                            newList.add(new ConfBeanParent("预约会议", beingList.size(), waitList));
 
                             //如果当前条数大于或等于总条数则禁用加载更多
                             if (beingList.size() >= Integer.parseInt(beingConfList.rowSum) &&
@@ -324,11 +361,19 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
      * @param parentPosition
      * @param childPosition
      */
-    private void finishConfRequest(String confId, String smcConfId, final int parentPosition, int childPosition) {
+    private void finishConfRequest(String confId,
+                                   String smcConfId,
+                                   final int parentPosition,
+                                   int childPosition) {
+        if (TextUtils.isEmpty(operatorId)) {
+            Toast.makeText(this, "操作人id不能为空!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .finishConf(confId, smcConfId)
+                .finishConf(confId, smcConfId, operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

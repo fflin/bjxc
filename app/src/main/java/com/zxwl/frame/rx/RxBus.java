@@ -31,7 +31,6 @@ public class RxBus {
      * 单例模式RxBus2
      */
     public static RxBus getInstance() {
-
         RxBus rxBus = mInstance;
         if (mInstance == null) {
             synchronized (RxBus.class) {

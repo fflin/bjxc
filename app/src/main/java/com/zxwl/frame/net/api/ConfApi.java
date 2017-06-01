@@ -215,8 +215,10 @@ public interface ConfApi {
      * @return
      */
     @GET(Urls.FINISH_CONF)
-    Observable<String> finishConf(@Query("smcConfId") String smcConfId,
-                                  @Query("confId") String confId);
+    Observable<String> finishConf(@Query("confId") String confId,
+                                  @Query("smcConfId") String smcConfId,
+                                  @Query("operatorId") String operatorId
+    );
 
     /**
      * 会议控制：移除会场
@@ -229,21 +231,24 @@ public interface ConfApi {
     @GET(Urls.DEL_SITE_FROM_CONF)
     Observable<String> delSiteFromConf(@Query("smcConfId") String smcConfId,
                                        @Query("confId") String confId,
-                                       @Query("siteUris") String siteUris);
+                                       @Query("siteUris") String siteUris,
+                                       @Query("operatorId") String operatorId);
 
     /**
      * 会议操作：设置主席
      */
     @GET(Urls.REQUEST_CHAIR)
     Observable<String> requestChair(@Query("smcConfId") String smcConfId,
-                                    @Query("siteUris") String siteUris);
+                                    @Query("siteUris") String siteUris,
+                                    @Query("operatorId") String operatorId);
 
     /**
      * 会议操作：取消主席
      */
     @GET(Urls.RELEASE_CHAIR)
     Observable<String> releaseChair(@Query("smcConfId") String smcConfId,
-                                    @Query("siteUris") String siteUris);
+                                    @Query("siteUris") String siteUris,
+                                    @Query("operatorId") String operatorId);
 
     /**
      * 会议操作：声控切换
@@ -253,7 +258,8 @@ public interface ConfApi {
      */
     @GET(Urls.SET_AUDIO_SWITCH)
     Observable<String> audioSwitch(@Query("smcConfId") String smcConfId,
-                                   @Query("isSwitch") String isSwitch);
+                                   @Query("isSwitch") String isSwitch,
+                                   @Query("operatorId") String operatorId);
 
     /**
      * 会议控制：广播会场
@@ -266,7 +272,8 @@ public interface ConfApi {
     @GET(Urls.SET_BROADCAST_SITE)
     Observable<String> broadcastSite(@Query("smcConfId") String smcConfId,
                                      @Query("siteUris") String siteUris,
-                                     @Query("isBroadcast") String isBroadcast);
+                                     @Query("isBroadcast") String isBroadcast,
+                                     @Query("operatorId") String operatorId);
 
     /**
      * 会场控制：喇叭静音(会场声音)
@@ -278,7 +285,8 @@ public interface ConfApi {
     @GET(Urls.CHANGE_SITE_IS_QUIET)
     Observable<String> changeSiteIsQuiet(@Query("smcConfId") String smcConfId,
                                          @Query("siteUris") String siteUris,
-                                         @Query("isQuiet") String isQuiet);
+                                         @Query("isQuiet") String isQuiet,
+                                         @Query("operatorId") String operatorId);
 
     /**
      * 会场控制：麦克风静音
@@ -291,7 +299,9 @@ public interface ConfApi {
     @GET(Urls.CHANGE_SITE_IS_MUTE)
     Observable<String> changeSiteIsMute(@Query("smcConfId") String smcConfId,
                                         @Query("siteUris") String siteUris,
-                                        @Query("isMute") String isMute);
+                                        @Query("isMute") String isMute,
+                                        @Query("operatorId") String operatorId
+    );
 
     /**
      * 会场控制:呼叫会场
@@ -302,7 +312,9 @@ public interface ConfApi {
      */
     @GET(Urls.CALL_SITE)
     Observable<String> callSite(@Query("smcConfId") String smcConfId,
-                                @Query("siteUris") String siteUris);
+                                @Query("siteUris") String siteUris,
+                                @Query("operatorId") String operatorId
+    );
 
     /**
      * 会场控制:断开会场
@@ -313,7 +325,10 @@ public interface ConfApi {
      */
     @GET(Urls.DISCONNECT_SITE)
     Observable<String> disconnectSite(@Query("smcConfId") String smcConfId,
-                                      @Query("siteUris") String siteUris);
+                                      @Query("siteUris") String siteUris,
+                                      @Query("operatorId") String operatorId
+
+    );
 
     /**
      * 设置分屏
@@ -329,8 +344,10 @@ public interface ConfApi {
     Observable<String> setSplitScreen(@Query("smcConfId") String confId,
                                       @Query("target") String target,
                                       @Query("presenceMode") String presenceMode,
-                                      @Query("subPics") String[]  subPics,
-                                      @Query("splitScreenTime") String splitScreenTime);
+                                      @Query("subPics") String[] subPics,
+                                      @Query("splitScreenTime") String splitScreenTime,
+                                      @Query("operatorId") String operatorId
+    );
 
     /**
      * 设置多画面参数
@@ -341,6 +358,8 @@ public interface ConfApi {
      */
     @GET(Urls.SET_BROADCAST_CONTINUOUS_PRESENCE)
     Observable<String> setBroadcastContinuousPresence(@Query("confId") String confId,
-                                                      @Query("isBroadcase") String isBroadcase);
+                                                      @Query("isBroadcase") String isBroadcase,
+                                                      @Query("operatorId") String operatorId
+    );
 }
 

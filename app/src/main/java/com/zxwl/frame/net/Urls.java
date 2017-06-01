@@ -7,8 +7,8 @@ package com.zxwl.frame.net;
  */
 public class Urls {
 
-//    public static final String BASE_URL = "http://10.10.31.174/bjxc/";//北京测试地址
-    public static final String BASE_URL = "http://192.168.0.111:8080/bjxc/";//公司测试地址
+    public static final String BASE_URL = "http://10.10.31.174/bjxc/";//北京测试地址
+//    public static final String BASE_URL = "http://192.168.0.147:8080/bjxc/";//公司测试地址
 //    public static final String BASE_URL = "http://192.168.222.233:10119/bjxc/";
 
     /**
@@ -35,6 +35,11 @@ public class Urls {
      * 预约会议
      */
     public static final String CONFACTION_SAVECONF = "confAction_saveConf.action";
+
+    /**
+     * 即时会议
+     */
+    public static final String SAVE_TIMELY_ENTITY = "confAction_saveTimelyEntity.action";
 
     /**
      * 查询通讯录
@@ -154,6 +159,7 @@ public class Urls {
      * 参数：
      * smcConfId
      * confId
+     * operatorId
      */
     public static final String FINISH_CONF = "confControlAction_cancelConf.action";
 

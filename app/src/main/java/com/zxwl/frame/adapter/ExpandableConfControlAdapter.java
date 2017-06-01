@@ -76,9 +76,9 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
 
     @Override
     public void onBindParentViewHolder(@NonNull ParentHolder parentViewHolder, int parentPosition, @NonNull ConfBeanParent parent) {
-        parentViewHolder.tvContent.setText(parent.type);
+        parentViewHolder.tvContent.setText(parent.type + "(" + getParentList().get(parentPosition).getChildList().size() + ")");
         //当重新设置parentList的时候要调用这个方法，强制设置右边的图标转换过来
-        if(resetFalg){
+        if (resetFalg) {
             parentViewHolder.onExpansionToggled(true);
         }
     }
@@ -194,8 +194,10 @@ public class ExpandableConfControlAdapter extends ExpandableRecyclerAdapter<Conf
     }
 
     public void reomve(int parentPosition, int childPosition) {
+//        parentList.get(parentPosition).getChildList().remove(childPosition);
         getParentList().get(parentPosition).getChildList().remove(childPosition);
-        notifyDataSetChanged();
+        notifyChildRangeRemoved(parentPosition, childPosition, 1);
+        notifyParentChanged(parentPosition);
     }
 
     class ParentHolder extends ParentViewHolder {

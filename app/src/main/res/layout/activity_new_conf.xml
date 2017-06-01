@@ -161,8 +161,8 @@
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_above="@id/line"
-        android:layout_below="@id/rl_operate"
+        android:layout_above="@+id/rl_buttom_operate"
+        android:layout_below="@+id/rl_operate"
         app:layout_widthPercent="70%">
 
         <RelativeLayout
@@ -294,19 +294,34 @@
                 android:textSize="12sp"
                 />
 
+            <!--<TextView-->
+            <!--android:id="@+id/tv_template"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignBaseline="@id/tv_quick_start"-->
+            <!--android:background="@drawable/bg_template"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_toLeftOf="@id/view_center"-->
+            <!--android:paddingBottom="6dp"-->
+            <!--android:paddingLeft="16dp"-->
+            <!--android:paddingRight="16dp"-->
+            <!--android:paddingTop="6dp"-->
+            <!--android:text="从模板生成"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:textSize="12sp"/>-->
             <TextView
                 android:id="@+id/tv_template"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/tv_quick_start"
-                android:layout_alignLeft="@id/et_name"
+                android:layout_toLeftOf="@id/view_center"
                 android:background="@drawable/bg_template"
                 android:gravity="center"
                 android:paddingBottom="6dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="6dp"
-                android:text="从模板生成"
+                android:text="会议持续时间"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"/>
 
@@ -314,8 +329,8 @@
                 android:id="@+id/tv_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/tv_template"
-                android:layout_toLeftOf="@id/view_center"
+                android:layout_alignBaseline="@id/tv_quick_start"
+                android:layout_alignLeft="@id/et_name"
                 android:background="@drawable/bg_template"
                 android:gravity="center"
                 android:paddingBottom="6dp"
@@ -357,7 +372,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="6dp"
-                android:text="通讯录"
+                android:text="会场目录"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"/>
 
@@ -373,11 +388,11 @@
                 android:paddingBottom="6dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:visibility="gone"
                 android:paddingTop="6dp"
                 android:text="常用群组"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/tv_device_lable"
@@ -432,7 +447,6 @@
 
             <!-- TODO 会议号码没用到-->
             <TextView
-                android:visibility="gone"
                 android:id="@+id/tv_conf_number_lable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -444,10 +458,10 @@
                 android:singleLine="true"
                 android:text="会议号码"
                 android:textSize="12sp"
+                android:visibility="gone"
                 />
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/tv_new_conf_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -462,10 +476,10 @@
                 android:paddingTop="6dp"
                 android:text="生成会议号码"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                android:visibility="gone"/>
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/tv_conf_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -479,6 +493,7 @@
                 android:padding="6dp"
                 android:singleLine="true"
                 android:textSize="12sp"
+                android:visibility="gone"
                 />
 
 
@@ -509,15 +524,14 @@
                 android:layout_marginTop="10dp"
                 android:maxLines="1"
                 android:paddingBottom="6dp"
-                android:visibility="gone"
                 android:paddingTop="6dp"
                 android:singleLine="true"
                 android:text="会议时间"
                 android:textSize="12sp"
+                android:visibility="gone"
                 />
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/tv_duration_lable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -531,10 +545,10 @@
                 android:singleLine="true"
                 android:text="会议时长："
                 android:textSize="12sp"
+                android:visibility="gone"
                 />
 
             <TextView
-                android:visibility="gone"
                 android:id="@+id/tv_conf_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -554,6 +568,7 @@
                 android:paddingTop="6dp"
                 android:singleLine="true"
                 android:textSize="12sp"
+                android:visibility="gone"
                 />
             <!-- TODO 即时会议时屏蔽会议时间-end -->
 
@@ -610,7 +625,7 @@
                 android:layout_alignLeft="@id/et_name"
                 android:layout_marginTop="10dp"
                 android:layout_toRightOf="@id/tv_email_check"
-                android:drawableLeft="@mipmap/icon_check_on"
+                android:drawableLeft="@mipmap/icon_check_off"
                 android:drawablePadding="12dp"
                 android:gravity="center_vertical"
                 android:maxLines="1"
@@ -685,6 +700,7 @@
                 android:singleLine="true"
                 android:text="短信模板"
                 android:textSize="12sp"
+                android:visibility="gone"
                 />
 
             <TextView
@@ -703,7 +719,8 @@
                 android:paddingTop="6dp"
                 android:text="编辑"
                 android:textColor="@android:color/white"
-                android:textSize="12sp"/>
+                android:textSize="12sp"
+                android:visibility="gone"/>
 
             <FrameLayout
                 android:id="@+id/fl_sms_content"
@@ -714,6 +731,7 @@
                 android:layout_marginTop="6dp"
                 android:background="@drawable/bg_booking_meeting_input"
                 android:padding="10dp"
+                android:visibility="gone"
                 >
 
                 <jp.wasabeef.richeditor.RichEditor

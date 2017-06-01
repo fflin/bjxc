@@ -32,7 +32,11 @@
         <activity
             android:name=".activity.WelcomActivity"
             android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
         <!-- 登录界面 -->
@@ -55,14 +59,7 @@
         <!-- 会议预约 -->
         <activity
             android:name=".activity.NewConfActivity"
-            android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-
+            android:screenOrientation="landscape"/>
 
         <!-- 会议审批弹出框 -->
         <activity

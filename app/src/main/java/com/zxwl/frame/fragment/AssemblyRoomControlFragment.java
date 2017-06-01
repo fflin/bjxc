@@ -70,13 +70,18 @@ public class AssemblyRoomControlFragment extends BaseFragment {
     private int currentIndex;//当前选中的下标
     private Subscription subscribe;
 
+    private String operatorId;
+    private String confId;
+
     public AssemblyRoomControlFragment() {
     }
 
-    public static AssemblyRoomControlFragment newInstance(String smcConfId, String confId) {
+    public static AssemblyRoomControlFragment newInstance(String smcConfId, String confId, String operatorId) {
         AssemblyRoomControlFragment fragment = new AssemblyRoomControlFragment();
         Bundle bundle = new Bundle();
+        bundle.putString(ConfControlActivity.CONF_ID, confId);
         bundle.putString(ConfControlActivity.SMC_CONF_ID, smcConfId);
+        bundle.putString(ConfControlActivity.OPERATOR_ID, operatorId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -104,7 +109,9 @@ public class AssemblyRoomControlFragment extends BaseFragment {
     @Override
     protected void init() {
         Bundle arguments = getArguments();
+        confId = (String) arguments.get(ConfControlActivity.CONF_ID);
         smcConfId = (String) arguments.get(ConfControlActivity.SMC_CONF_ID);
+        operatorId = (String) arguments.get(ConfControlActivity.OPERATOR_ID);
 
         //初始化刷新头部
         initRefresh();
@@ -354,7 +361,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .changeSiteIsQuiet(smcConfId, siteUris, isQuiet)
+                .changeSiteIsQuiet(smcConfId, siteUris, isQuiet,operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -391,7 +398,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .changeSiteIsMute(smcConfId, siteUris, isMute)
+                .changeSiteIsMute(smcConfId, siteUris, isMute,operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -424,7 +431,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .callSite(smcConfId, siteUris)
+                .callSite(smcConfId, siteUris,operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -452,7 +459,7 @@ public class AssemblyRoomControlFragment extends BaseFragment {
         HttpUtils.getInstance(getContext())
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .disconnectSite(smcConfId, siteUris)
+                .disconnectSite(smcConfId, siteUris,operatorId)
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

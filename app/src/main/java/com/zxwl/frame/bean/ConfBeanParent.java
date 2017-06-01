@@ -11,10 +11,12 @@ import java.util.List;
  */
 public class ConfBeanParent implements Parent<ConfBean> {
     public String type;
+    public int count;
     public List<ConfBean> beanList;
 
-    public ConfBeanParent(String type, List<ConfBean> beanList) {
+    public ConfBeanParent(String type, int count, List<ConfBean> beanList) {
         this.type = type;
+        this.count = count;
         this.beanList = beanList;
     }
 

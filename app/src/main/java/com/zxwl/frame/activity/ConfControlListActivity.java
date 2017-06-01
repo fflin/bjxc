@@ -96,7 +96,7 @@ public class ConfControlListActivity extends BaseActivity implements View.OnClic
             public void onControl(int position) {
                 setAdapterShow(position);
                 //控制会议
-                ConfControlActivity.startActivity(ConfControlListActivity.this, list.get(position).smcConfId, list.get(position).id);
+//                ConfControlActivity.startActivity(ConfControlListActivity.this, list.get(position).smcConfId, list.get(position).id);
             }
 
             @Override
@@ -124,7 +124,7 @@ public class ConfControlListActivity extends BaseActivity implements View.OnClic
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .finishConf(confId, smcConfId)
+                .finishConf(confId, smcConfId,"")
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
