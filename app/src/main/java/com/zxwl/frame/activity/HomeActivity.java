@@ -75,7 +75,7 @@ public class HomeActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     * TODO 后期需要删除
+     * TODO 给客户测试时使用,后期需要删除
      * 判断权限,如果权限过期则不可用
      */
     private void judgePower() {

@@ -1,6 +1,5 @@
 package com.zxwl.frame.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,8 +7,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -24,6 +26,7 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.wang.avi.AVLoadingIndicatorView;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -52,7 +55,10 @@ import java.util.List;
 
 import okhttp3.Call;
 
-public class ContactBookDialogActivity extends Activity implements View.OnClickListener {
+/**
+ * 通讯录弹框界面
+ */
+public class ContactBookDialogActivity extends RxAppCompatActivity implements View.OnClickListener {
     private List<Department> mDatas3 = new ArrayList<Department>();//组织部门总数量
     //private List<Department> mDatas4 = new ArrayList<Department>();
     private List<Employee> allEmployee = new ArrayList<>();//人员总数量
@@ -85,6 +91,8 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
     private TextView tv_employeeFailed;//左侧列表请求失败或者没有数据时显示
     private AVLoadingIndicatorView departmentLoadingView;//右侧列表请求对话框
     private AVLoadingIndicatorView employeeLoadingView;//左侧列表请求对话框
+    private boolean isLoading;
+    private boolean loadFailed;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, ContactBookDialogActivity.class));
@@ -94,6 +102,13 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contactbook_dialog);
+        Window window = getWindow();
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay();
+        WindowManager.LayoutParams p = window.getAttributes();
+        p.height = (int) (d.getHeight() * 0.9); // 高度设置为屏幕的0.8，根据实际情况调整
+        p.width = (int) (d.getWidth() * 0.9); // 宽度设置为屏幕的0.9，根据实际情况调整
+        window.setAttributes(p);
         eventBus = EventBus.getDefault();
         eventBus.register(this);
 
@@ -131,11 +146,13 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                 if (isChecked) {
                     //全选操作
                     isChange = false;
-                    selectedDepartment.clear();
-                    selectedDepartment.addAll(allEmployee);
-                    setAdapter(selectedDepartment);
-                    tvNum.setText("(" + allEmployee.size() + ")");
-                    tv_employeeFailed.setVisibility(View.GONE);
+                    if (!loadFailed){
+                        selectedDepartment.clear();
+                        selectedDepartment.addAll(allEmployee);
+                        setAdapter(selectedDepartment);
+                        tvNum.setText("(" + allEmployee.size() + ")");
+                        tv_employeeFailed.setVisibility(View.GONE);
+                    }
 
                 } else {
                     //取消全选操作
@@ -143,8 +160,13 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                         selectedDepartment.clear();
                         employeeAdapter.notifyDataSetChanged();
                         tvNum.setText("(" + 0 + ")");
-                        tv_employeeFailed.setText(getResources().getString(R.string.contact_book_nodata));
-                        tv_employeeFailed.setVisibility(View.VISIBLE);
+                        if (isLoading||loadFailed){
+
+                        }else{
+                            tv_employeeFailed.setText(getResources().getString(R.string.contact_book_nodata));
+                            tv_employeeFailed.setVisibility(View.VISIBLE);
+                        }
+
                     }
                 }
                 try {
@@ -176,8 +198,6 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
 
             }
         });
-
-
     }
 
     //获取所有人员
@@ -185,12 +205,20 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
         employeeLoadingView.setVisibility(View.VISIBLE);
         employeeLoadingView.show();
         tv_employeeFailed.setVisibility(View.GONE);
+        isLoading = true;
         OkHttpUtils.get()
-                .url(Urls.BASE_URL + "employeeAction_queryList1.action")
+                .url(Urls.BASE_URL + Urls.QUERY_ALL_EMPLOYEE)
+                .addParams("pageSize", Integer.MAX_VALUE + "")
+                .addParams("pageNum", Integer.MAX_VALUE + "")
                 .build()
+                .connTimeOut(10000)
+                .readTimeOut(10000)
+                .writeTimeOut(10000)
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
+                        isLoading = false;
+                        loadFailed = true;
                         tv_employeeFailed.setVisibility(View.VISIBLE);
                         tv_employeeFailed.setText(getResources().getString(R.string.contact_book_failed));
                         employeeLoadingView.hide();
@@ -199,6 +227,8 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                     @Override
                     public void onResponse(String response, int id) {
                         try {
+                            isLoading = false;
+                            loadFailed = false;
                             employeeLoadingView.hide();
                             tv_employeeFailed.setVisibility(View.GONE);
                             JSONObject object = new JSONObject(response);
@@ -218,15 +248,18 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                                     employee.setTypeName(object1.getString("typeName"));
                                     allEmployee.add(employee);
                                 }
+
                             } else {
                                 tv_employeeFailed.setVisibility(View.VISIBLE);
                                 tv_employeeFailed.setText(R.string.contact_book_nodata);
                             }
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 });
+
     }
 
     //获取组织
@@ -238,6 +271,9 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
         OkHttpUtils.get()
                 .url(Urls.BASE_URL + Urls.QUERY_ALL_DEPARTMENT)
                 .build()
+                .connTimeOut(10000)
+                .readTimeOut(10000)
+                .writeTimeOut(10000)
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
@@ -249,6 +285,7 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                     @Override
                     public void onResponse(String response, int id) {
                         try {
+
                             departmentLoadingView.hide();
                             JSONArray array = new JSONArray(response.toString());
                             if (array.length() != 0) {
@@ -273,13 +310,18 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                                 tv_departmentFailed.setVisibility(View.VISIBLE);
                                 tv_departmentFailed.setText(R.string.contact_book_nodata);
                             }
-                            //setTreeClick();
+                            //部门列表条目点击事件
+                            //setOnNodeClickListener();
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 });
+
+
     }
+
 
     //接收条目中checkbox事件
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -297,6 +339,7 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
         }
         //点击
         if (select) {
+
             String orgNo = nodes.get(position).getId();
             List<Employee> tempCheck = new ArrayList<>();//临时存储
             tempCheck.clear();//每次点击先重置，用来确定该单位下有没有数据
@@ -321,7 +364,9 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
             setAdapter(selectedDepartment);
 //            employeeAdapter = new EmployeeAdapter(ContactBookDialogActivity.this, selectedDepartment, eventBus);
 //            lv_employee.setAdapter(employeeAdapter);
+
         } else {//取消
+
             String orgNo = nodes.get(position).getId();
             List<Employee> tempUnCheck = new ArrayList<>();//临时存储
             for (int i = 0; i < allEmployee.size(); i++) {
@@ -335,22 +380,27 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
             selectedDepartment.removeAll(tempUnCheck);//删除该单位下所有数据
             tempUnCheck.clear();
 
+
             if (selectedDepartment.size() == 0) {
                 tv_employeeFailed.setVisibility(View.VISIBLE);
                 tv_employeeFailed.setText(R.string.contact_book_nodata);
+
             } else {
                 tv_employeeFailed.setVisibility(View.GONE);
             }
+
         }
         setAdapter(selectedDepartment);
         setText(size, allNum);
         tvNum.setText("(" + selectedDepartment.size() + ")");
+
     }
 
     private void setAdapter(List<Employee> list) {
         employeeAdapter = new EmployeeAdapter(ContactBookDialogActivity.this, list, eventBus);
         lv_employee.setAdapter(employeeAdapter);
     }
+
 
     @Override
     protected void onDestroy() {
@@ -385,6 +435,7 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
             if (confirmEmployee.contains(employee)) {
                 confirmEmployee.remove(employee);
             }
+
         }
     }
 
@@ -395,7 +446,6 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
             case R.id.btn_cancel://取消
                 finish();
                 break;
-
             case R.id.btn_confirm: //确认
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title("参会列表")
@@ -405,39 +455,44 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                //Toast.makeText(ContactBookDialogActivity.this, "11", Toast.LENGTH_SHORT).show();
                                 eventBus.post(new ConfirmEvent(confirmEmployee, allEmployee.size()));
                                 finish();
                             }
                         })
                         .build();
-                dialog.show();
-                break;
-
-            case R.id.btn_clear://清空
-                confirmEmployee.clear();
-                selectedDepartment.clear();
-                for (int i = 0, p = mDatas3.size(); i < p; i++) {
-                    mAdapter.getMap().put(i, false);
+                if (0 == confirmEmployee.size()) {
+                    Toast.makeText(ContactBookDialogActivity.this, "请点击会场列表选择参会人员！", Toast.LENGTH_LONG).show();
+                } else {
+                    dialog.show();
                 }
-                mAdapter.notifyDataSetChanged();
-                cb_checkAll.setChecked(false);
-                setText(0, allNum);
-                tvNum.setText("(" + 0 + ")");
-                tv_employeeFailed.setVisibility(View.VISIBLE);
-                tv_employeeFailed.setText(R.string.contact_book_nodata);
-                break;
 
+
+                break;
+            case R.id.btn_clear://清空
+                    if (allEmployee.size()!=0&&selectedDepartment.size()!=0){
+                        confirmEmployee.clear();
+                        selectedDepartment.clear();
+                        for (int i = 0, p = mDatas3.size(); i < p; i++) {
+                            mAdapter.getMap().put(i, false);
+                        }
+                        mAdapter.notifyDataSetChanged();
+                        cb_checkAll.setChecked(false);
+                        setText(0, allNum);
+                        tvNum.setText("(" + 0 + ")");
+                        tv_employeeFailed.setVisibility(View.VISIBLE);
+                        tv_employeeFailed.setText(R.string.contact_book_nodata);
+                    }
+
+                break;
             case R.id.iv_close://关闭按钮
                 finish();
                 break;
-
             case R.id.tv_departmentFailed:
                 if (getResources().getString(R.string.contact_book_failed).equals(tv_departmentFailed.getText().toString())) {
                     initDepartmentDatas();
                 }
-                break;
 
+                break;
             case R.id.tv_employeeFailed:
                 if (getResources().getString(R.string.contact_book_failed).equals(tv_employeeFailed.getText().toString())) {
                     initEmployeeDatas();
@@ -455,6 +510,7 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
         confirmAdapter = new ConfirmAdapter(dialogListEmployee, this);
         lv_confirm.setAdapter(confirmAdapter);
         SwipeMenuCreator creator = new SwipeMenuCreator() {
+
             @Override
             public void create(SwipeMenu menu) {
                 // create "open" item
@@ -491,32 +547,34 @@ public class ContactBookDialogActivity extends Activity implements View.OnClickL
                 return false;
             }
         });
+
+
         return dialogView;
     }
 
-    private void setTreeClick() {
-        //部门列表条目点击事件
+//    private void setOnNodeClickListener() {
 //        mAdapter.setOnTreeNodeClickListener(new TreeListViewAdapter.OnTreeNodeClickListener() {
 //            @Override
 //            public void onClick(Node node, int position) {
-//                    mDatas5.clear();
-//                    String orgNo = mDatas3.get(position).getId();
-//                    Log.i("TAG","name==="+mDatas3.get(position).getDepartmentName()+","+"orgNo===="+orgNo+","+position);
-//                    for (int i=0;i<mDatas4.size();i++){
-//                        if (mDatas4.get(i).getOrgNo().equals(orgNo)){
-//                            mDatas5.add(mDatas4.get(i));
-//                        }
+//                mDatas5.clear();
+//                String orgNo = mDatas3.get(position).getId();
+//                Log.i("TAG", "name===" + mDatas3.get(position).getDepartmentName() + "," + "orgNo====" + orgNo + "," + position);
+//                for (int i = 0; i < mDatas4.size(); i++) {
+//                    if (mDatas4.get(i).getOrgNo().equals(orgNo)) {
+//                        mDatas5.add(mDatas4.get(i));
 //                    }
-//                    if (mDatas5.size()==0){
-//                        tv_noData.setVisibility(View.VISIBLE);
-//                    }else{
-//                        tv_noData.setVisibility(View.GONE);
-//                    }
-//                    employeeAdapter = new EmployeeAdapter(ContactBookDialogActivity.this,mDatas5);
-//                    lv_employee.setAdapter(employeeAdapter);
+//                }
+//                if (mDatas5.size() == 0) {
+//                    tv_noData.setVisibility(View.VISIBLE);
+//                } else {
+//                    tv_noData.setVisibility(View.GONE);
+//                }
+//                employeeAdapter = new EmployeeAdapter(ContactBookDialogActivity.this, mDatas5);
+//                lv_employee.setAdapter(employeeAdapter);
 //                Toast.makeText(getApplicationContext(), node.getName(),
 //                        Toast.LENGTH_SHORT).show();
 //            }
+//
 //        });
-    }
+//    }
 }

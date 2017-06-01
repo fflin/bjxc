@@ -28,7 +28,6 @@ public class HistoryGridAdapter extends RecyclerView.Adapter<HistoryGridAdapter.
             R.mipmap.icon_conf_purple
     };
 
-
     public HistoryGridAdapter(List<ConfBean> list) {
         this.list = list;
     }
@@ -45,7 +44,6 @@ public class HistoryGridAdapter extends RecyclerView.Adapter<HistoryGridAdapter.
 
         int i = position % resIds.length;
         holder.tvName.setCompoundDrawablesWithIntrinsicBounds(0, resIds[i], 0, 0);
-
 
         holder.llContent.setOnClickListener(
                 v->{
@@ -64,8 +62,14 @@ public class HistoryGridAdapter extends RecyclerView.Adapter<HistoryGridAdapter.
         return list.get(position);
     }
 
-    public void addAll(List<ConfBean> list) {
-        this.list.addAll(list);
+    public void addList(List<ConfBean> newlist) {
+        list.addAll(newlist);
+        notifyDataSetChanged();
+    }
+
+    public void setNewList(List<ConfBean> newlist) {
+        list.clear();
+        list.addAll(newlist);
         notifyDataSetChanged();
     }
 

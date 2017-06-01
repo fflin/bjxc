@@ -6,15 +6,29 @@
     android:minHeight="40dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <RelativeLayout
+        android:id="@+id/rlchoose"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_widthPercent="7%"
+        android:layout_centerVertical="true">
+        <ImageView
+            android:id="@+id/ivDot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/tvEmployeeName"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:textSize="18sp"
         android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/rlchoose"
         android:gravity="center"
         android:textColor="#000000"
-        app:layout_widthPercent="33%"/>
+        app:layout_widthPercent="31%"/>
     <TextView
         android:id="@+id/tvEmployeeNo"
         android:layout_width="wrap_content"
@@ -25,7 +39,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/tvEmployeeName"
         android:layout_toEndOf="@+id/tvEmployeeName"
-        app:layout_widthPercent="33%"/>
+        app:layout_widthPercent="31%"/>
     <TextView
         android:id="@+id/tvEmployeeType"
         android:layout_width="wrap_content"
@@ -36,6 +50,6 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/tvEmployeeNo"
         android:layout_toEndOf="@+id/tvEmployeeNo"
-        app:layout_widthPercent="33%"/>
+        app:layout_widthPercent="31%"/>
 
 </com.zhy.android.percent.support.PercentRelativeLayout>

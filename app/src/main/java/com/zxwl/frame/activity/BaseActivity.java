@@ -33,6 +33,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
      * @return
      */
     protected abstract int getLayoutId();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

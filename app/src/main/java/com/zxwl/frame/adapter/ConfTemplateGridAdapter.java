@@ -58,6 +58,17 @@ public class ConfTemplateGridAdapter extends RecyclerView.Adapter<ConfTemplateGr
         return null != list ? list.size() : 0;
     }
 
+    public void setNewList(List<ConfBean> dataList) {
+        list.clear();
+        list.addAll(dataList);
+        notifyDataSetChanged();
+    }
+
+    public void addList(List<ConfBean> dataList) {
+        list.addAll(dataList);
+        notifyDataSetChanged();
+    }
+
     public static class Holder extends RecyclerView.ViewHolder {
         LinearLayout llContent;
         TextView tvName;

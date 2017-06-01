@@ -23,8 +23,6 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-import com.zxwl.frame.App;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -65,10 +63,8 @@ public class ACache {
     }
 
     public static ACache get(Context ctx, String cacheName) {
-//        File cache = ctx.getCacheDir();
-//        File f = new File(cache, cacheName);
-
-        File f = App.getFile();
+        File f = new File(ctx.getCacheDir(), cacheName);
+//        File f = App.getFile();
         return get(f, MAX_SIZE, MAX_COUNT);
     }
 

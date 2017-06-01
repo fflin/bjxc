@@ -108,6 +108,7 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
         initRefresh();
 
         initRxBus();
+
         //开始刷新
         refreshLayout.startRefresh();
     }
@@ -140,10 +141,6 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
 
                     }
                 }
-//                position -> {
-//                    approvalIndex = position;
-//                    ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
-//                }
         );
 
         listAdapter.setOnItemClickListener(
@@ -155,10 +152,6 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
 
                     }
                 }
-//                position -> {
-//                    approvalIndex = position;
-//                    ConfApprovalDialogActivity.startActivity(ConfApprovalListActivity.this, list.get(position));
-//                }
         );
         //设置recyclerview的适配器和样式管理器
         setRecyclerLayout();
@@ -193,6 +186,7 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
         tvIssue.setOnClickListener(this);//帮助
         tvHome.setOnClickListener(this);//返回主页
         tvName.setOnClickListener(this);//名字
+        tvLayout.setOnClickListener(this);//切换布局按钮
 
         //设置刷新事件
         refreshLayout.setOnRefreshListener(
@@ -210,8 +204,6 @@ public class ConfApprovalListActivity extends BaseActivity implements View.OnCli
                         getData(PAGE_NUM + 1);
                     }
                 });
-        //切换布局按钮
-        tvLayout.setOnClickListener(this);
     }
 
     @Override

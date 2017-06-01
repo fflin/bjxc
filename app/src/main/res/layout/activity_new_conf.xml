@@ -373,6 +373,7 @@
                 android:paddingBottom="6dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
+                android:visibility="gone"
                 android:paddingTop="6dp"
                 android:text="常用群组"
                 android:textColor="@android:color/white"
@@ -428,7 +429,10 @@
                 android:visibility="gone"
                 />
 
+
+            <!-- TODO 会议号码没用到-->
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_conf_number_lable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -443,6 +447,7 @@
                 />
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_new_conf_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -460,6 +465,7 @@
                 android:textSize="12sp"/>
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_conf_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -494,6 +500,7 @@
                 android:visibility="invisible"
                 />
 
+            <!-- TODO 即时会议时屏蔽会议时间-start -->
             <TextView
                 android:id="@+id/tv_conf_time_lable"
                 android:layout_width="wrap_content"
@@ -502,6 +509,7 @@
                 android:layout_marginTop="10dp"
                 android:maxLines="1"
                 android:paddingBottom="6dp"
+                android:visibility="gone"
                 android:paddingTop="6dp"
                 android:singleLine="true"
                 android:text="会议时间"
@@ -509,6 +517,7 @@
                 />
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_duration_lable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -525,6 +534,7 @@
                 />
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_conf_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -545,6 +555,7 @@
                 android:singleLine="true"
                 android:textSize="12sp"
                 />
+            <!-- TODO 即时会议时屏蔽会议时间-end -->
 
             <TextView
                 android:id="@+id/tv_duration"

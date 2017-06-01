@@ -14,6 +14,16 @@
         android:layout_marginRight="5dp"
         android:src="@mipmap/tree_ec"/>
 
+    <TextView
+        android:id="@+id/id_treenode_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/id_treenode_icon"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textSize="18dip"/>
+
     <CheckBox
         android:id="@+id/cb_check"
         style="@style/CustomCheckboxTheme"
@@ -22,18 +32,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="15dp"
+        android:scaleX="1.3"
+        android:scaleY="1.3"
         android:focusable="false"/>
-
-    <TextView
-        android:id="@+id/id_treenode_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/cb_check"
-        android:layout_toRightOf="@id/id_treenode_icon"
-        android:gravity="left|center_vertical"
-        android:text="@string/app_name"
-        android:textSize="18sp"/>
-
-
 </RelativeLayout>

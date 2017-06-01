@@ -36,7 +36,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private boolean saveInfo = false;
 
     //保存缓存
-    private ACache mCache = ACache.get(this);
+    private ACache mCache;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, LoginActivity.class));
@@ -124,9 +124,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .progressIndeterminateStyle(false)
                 .build();
         //点击对话框以外的地方，对话框不消失
-//        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCanceledOnTouchOutside(false);
         //点击对话框意外的地方和返回键，对话框都不消失
-        dialog.setCancelable(false);
+//        dialog.setCancelable(false);
         dialog.show();
 
         HttpUtils.getInstance(this)
@@ -164,8 +164,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 String asString = mCache.getAsString(Account.LOGIN_TIME);
                                 //如果为空则代表没有登录成功过,没有纪录过权限数据,所以需要纪录
                                 if (TextUtils.isEmpty(asString)) {
-//                                    mCache.put(Account.LOGIN_TIME, "true", 7 * ACache.TIME_DAY);
-                                    mCache.put(Account.LOGIN_TIME, "true", ACache.TIME_DAY);
+                                    mCache.put(Account.LOGIN_TIME, "true", 5 * ACache.TIME_DAY);
+//                                    mCache.put(Account.LOGIN_TIME, "true", 60 * 5);
                                 }
                             }
 
@@ -175,23 +175,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
                             }
                         }
-//                        //成功操作
-//                        userInfo -> {
-//                            dialog.dismiss();
-//                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-//                            //存储登录状态
-//                            PreferencesHelper.saveData(Account.IS_LOGIN, "true");
-//                            //保存用户信息
-//                            UserHelper.saveUser(userInfo);
-//                            //跳转到登录界面
-//                            HomeActivity.startActivity(LoginActivity.this);
-//                            finish();
-//                        },
-//                        //异常时候的操作
-//                        responeThrowable -> {
-//                            dialog.dismiss();
-//                            Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
-//                        }
                 );
     }
 

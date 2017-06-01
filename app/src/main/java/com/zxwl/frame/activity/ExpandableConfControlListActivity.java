@@ -58,7 +58,7 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
     /*列表刷新-start*/
     private TwinklingRefreshLayout refreshLayout;
     private RecyclerView rvList;
-    private int PAGE_SIZE = 3;
+    private int PAGE_SIZE = 5;
     private int PAGE_NUM = 0;
     private ExpandableConfControlAdapter adapter;
     private List<ConfBeanParent> list = new ArrayList<>();
@@ -296,9 +296,10 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                             refreshLayout.setEnableLoadmore(enableLoadmore);
                             Toast.makeText(ExpandableConfControlListActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
                         }
-
+                        //清空数据添加新数据并刷新适配器
                         list.clear();
                         list.addAll(confBeanParents);
+                        //设置是否重置右边图标的标志
                         adapter.setResetFalg(true);
                         adapter.notifyParentDataSetChanged(true);
                     }
@@ -306,6 +307,11 @@ public class ExpandableConfControlListActivity extends BaseActivity implements V
                     @Override
                     protected void onError(ResponeThrowable responeThrowable) {
                         Toast.makeText(ExpandableConfControlListActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+                        if (1 == pageNum) {
+                            refreshLayout.finishRefreshing();
+                        } else {
+                            refreshLayout.finishLoadmore();
+                        }
                     }
                 });
     }

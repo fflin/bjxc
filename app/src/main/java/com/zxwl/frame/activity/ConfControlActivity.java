@@ -40,11 +40,6 @@ import rx.functions.Action1;
  * 会议控制面板
  */
 public class ConfControlActivity extends BaseActivity implements View.OnClickListener {
-    private TextView tvLogOut;
-    private TextView tvIssue;
-    private TextView tvHome;
-    private TextView tvName;
-
     private TextView tvPreview;//画面预览
     private TextView tvExtendConf;//延长会议
     private TextView tvFinishTime;//会议结束时间
@@ -75,11 +70,6 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     protected void findViews() {
-        tvLogOut = (TextView) findViewById(R.id.tv_log_out);
-        tvIssue = (TextView) findViewById(R.id.tv_issue);
-        tvHome = (TextView) findViewById(R.id.tv_home);
-        tvName = (TextView) findViewById(R.id.tv_name);
-
         tvPreview = (TextView) findViewById(R.id.tv_preview);
         tvExtendConf = (TextView) findViewById(R.id.tv_extend_conf);
         tvFinishTime = (TextView) findViewById(R.id.tv_finish_time);
@@ -258,7 +248,6 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-
     /**
      * viewpager的适配器
      */
@@ -284,5 +273,4 @@ public class ConfControlActivity extends BaseActivity implements View.OnClickLis
             return fragmentList.get(position);
         }
     }
-
 }

@@ -7,7 +7,8 @@ package com.zxwl.frame.net;
  */
 public class Urls {
 
-    public static final String BASE_URL = "http://192.168.0.111:8080/bjxc/";
+//    public static final String BASE_URL = "http://10.10.31.174/bjxc/";//北京测试地址
+    public static final String BASE_URL = "http://192.168.0.111:8080/bjxc/";//公司测试地址
 //    public static final String BASE_URL = "http://192.168.222.233:10119/bjxc/";
 
     /**
@@ -39,6 +40,11 @@ public class Urls {
      * 查询通讯录
      */
     public static final String QUERY_ALL_DEPARTMENT = "departmentAction_queryAllDepartment.action";
+
+    /**
+     * 查询通讯录中部门下属人员
+     */
+    public static final String QUERY_ALL_EMPLOYEE = "employeeAction_queryList1.action";
 
     /**
      * 查询会议历史列表

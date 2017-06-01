@@ -119,6 +119,11 @@ public class BookingMeetingActivity extends BaseActivity implements View.OnClick
     private long tenYears = 10L * 365 * 1000 * 60 * 60 * 24L;
     /*时间选择框*/
 
+    private int PAGE_SIZE = 20;
+
+    private int HISTORY_PAGE_NUM = 0;//历史会议列表的请求页码
+    private int TEMPLATE_PAGE_NUM = 0;//会议模板列表的请求页码
+
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, BookingMeetingActivity.class));
     }
@@ -689,7 +694,7 @@ public class BookingMeetingActivity extends BaseActivity implements View.OnClick
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .getTemplateList()
+                .getTemplateList(PAGE_SIZE, TEMPLATE_PAGE_NUM)
                 .compose(new ListDefaultTransformer<ConfBean>())
                 .subscribe(new RxSubscriber<List<ConfBean>>() {
                     @Override
@@ -701,6 +706,72 @@ public class BookingMeetingActivity extends BaseActivity implements View.OnClick
                     @Override
                     protected void onError(ResponeThrowable responeThrowable) {
                         Toast.makeText(BookingMeetingActivity.this, "数据请求失败，请稍后再试", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * 通过id查询历史会议的设备名称
+     *
+     * @param id 会议Id
+     */
+    private void getHistoryById(String id) {
+        Map<String, String> params = new HashMap<>();
+        params.put("id", id);
+
+        String url = Urls.BASE_URL + Urls.QUERY_HISTORY_ID;
+
+        OkHttpUtils
+                .post()//
+                .url(url)//
+                .params(params)//
+                .build()//
+                .execute(new GenericsCallback<String>(new JsonGenericsSerializator() {
+                }) {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Toast.makeText(BookingMeetingActivity.this, "获取数据失败,情稍后再试", Toast.LENGTH_SHORT).show();
+                    }
+
+                    //_TN_C1,_TN_C6727,_TN_C6516,-3829,3828,3785,
+                    @Override
+                    public void onResponse(String response, int id) {
+                        String[] split = response.split(",");
+                        currentHistoryBean.deviceNumber = String.valueOf(split.length);
+                        currentHistoryBean.deviceName = response;
+                        // 选中的条目添加到列表中去
+                        attendingListAdapter.add(currentHistoryBean);
+                    }
+                });
+    }
+
+    /**
+     * 获得历史会议的列表
+     */
+    private void getHistoryList() {
+        HttpUtils.getInstance(this)
+                .getRetofitClinet()
+                .builder(ConfApi.class)
+                .getHistoryList(PAGE_SIZE,HISTORY_PAGE_NUM)
+                .compose(new ListDefaultTransformer<ConfBean>())
+                .subscribe(new RxSubscriber<List<ConfBean>>() {
+                    @Override
+                    public void onSuccess(List<ConfBean> confBeen) {
+                        historyAdapter = new HistoryListAdapter(confBeen);
+                        historyAdapter.setOnItemClickListener(new HistoryListAdapter.onItemClickListener() {
+                            @Override
+                            public void onClick(int position) {
+                                historyAdapter.setCurrenIndex(position);
+                                //设置当前选中的历史bean
+                                currentHistoryIndex = position;
+                            }
+                        });
+                        initDialog(DIALOG_TYPE_HISTORY, historyAdapter);
+                    }
+
+                    @Override
+                    protected void onError(ResponeThrowable responeThrowable) {
+                        Toast.makeText(BookingMeetingActivity.this, "获取数据失败,请稍后再试", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -814,6 +885,7 @@ public class BookingMeetingActivity extends BaseActivity implements View.OnClick
                             //设置高级参数ID
                             confParametersId = confParametersBeanList.get(0).id;
                         }
+                        //高级会议列表参数获取成功
                         confParamrRequestFalg = true;
                     }
 
@@ -824,71 +896,4 @@ public class BookingMeetingActivity extends BaseActivity implements View.OnClick
                     }
                 });
     }
-
-    /**
-     * 通过id查询历史会议的设备名称
-     *
-     * @param id 会议Id
-     */
-    private void getHistoryById(String id) {
-        Map<String, String> params = new HashMap<>();
-        params.put("id", id);
-
-        String url = Urls.BASE_URL + Urls.QUERY_HISTORY_ID;
-
-        OkHttpUtils
-                .post()//
-                .url(url)//
-                .params(params)//
-                .build()//
-                .execute(new GenericsCallback<String>(new JsonGenericsSerializator() {
-                }) {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Toast.makeText(BookingMeetingActivity.this, "获取数据失败,情稍后再试", Toast.LENGTH_SHORT).show();
-                    }
-
-                    //_TN_C1,_TN_C6727,_TN_C6516,-3829,3828,3785,
-                    @Override
-                    public void onResponse(String response, int id) {
-                        String[] split = response.split(",");
-                        currentHistoryBean.deviceNumber = String.valueOf(split.length);
-                        currentHistoryBean.deviceName = response;
-                        // 选中的条目添加到列表中去
-                        attendingListAdapter.add(currentHistoryBean);
-                    }
-                });
-    }
-
-    /**
-     * 获得历史会议的列表
-     */
-    private void getHistoryList() {
-        HttpUtils.getInstance(this)
-                .getRetofitClinet()
-                .builder(ConfApi.class)
-                .getHistoryList()
-                .compose(new ListDefaultTransformer<ConfBean>())
-                .subscribe(new RxSubscriber<List<ConfBean>>() {
-                    @Override
-                    public void onSuccess(List<ConfBean> confBeen) {
-                        historyAdapter = new HistoryListAdapter(confBeen);
-                        historyAdapter.setOnItemClickListener(new HistoryListAdapter.onItemClickListener() {
-                            @Override
-                            public void onClick(int position) {
-                                historyAdapter.setCurrenIndex(position);
-                                //设置当前选中的历史bean
-                                currentHistoryIndex = position;
-                            }
-                        });
-                        initDialog(DIALOG_TYPE_HISTORY, historyAdapter);
-                    }
-
-                    @Override
-                    protected void onError(ResponeThrowable responeThrowable) {
-                        Toast.makeText(BookingMeetingActivity.this, "获取数据失败,请稍后再试", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
 }

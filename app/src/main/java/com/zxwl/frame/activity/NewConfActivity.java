@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.dinuscxj.itemdecoration.GridOffsetsItemDecoration;
 import com.jzxiang.pickerview.TimePickerDialog;
 import com.jzxiang.pickerview.data.Type;
 import com.jzxiang.pickerview.listener.OnDateSetListener;
@@ -117,7 +116,6 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     private FrameLayout flSMSContent;
     private RichEditor reSMSContent;
 
-
     private boolean emailNoticeFlag = false;//是否用邮件通知
     private boolean smsNoticeFlag = true;//是否用短信通知
 
@@ -138,12 +136,13 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
     /*时间选择框-start*/
     private TimePickerDialog startTimeDialog;
-    private TimePickerDialog endTimeDialog;
     private long startTimeLong;
     private long endTimeLong;
     private String startTime;
     private String endTime;
     private long tenYears = 10L * 365 * 1000 * 60 * 60 * 24L;
+    private final static int START_TIME_DIALOG = 1;
+    private final static int END_TIME_DIALOG = 2;
     /*时间选择框-end*/
 
     /*短信列表模板适配器--start*/
@@ -172,6 +171,16 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     /*右侧联系人列表-end*/
 
     private MaterialDialog dialog;
+
+    private int PAGE_SIZE = 2;
+
+    private int HISTORY_PAGE_NUM = 0;//历史会议列表的请求页码
+    private int TEMPLATE_PAGE_NUM = 0;//会议模板列表的请求页码
+
+    private boolean initHistoryFalg = false;//历史会议dialog创建成功
+    private boolean initConfTemplateFalg = false;//会议模板dialog创建成功
+
+    private TwinklingRefreshLayout dialogRefreshLayout;
 
     public static void startActivity(Context context) {
         context.startActivity(new Intent(context, NewConfActivity.class));
@@ -228,7 +237,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         tvIssue.setVisibility(View.VISIBLE);
         tvHome.setVisibility(View.VISIBLE);
         tvName.setVisibility(View.VISIBLE);
-        if(null!=UserHelper.getSavedUser()){
+        if (null != UserHelper.getSavedUser()) {
             tvName.setText(UserHelper.getSavedUser().name);
         }
 
@@ -331,7 +340,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //会议时间
             case R.id.tv_conf_time:
-                showStartTimeDialog();
+                showTimeDialog(START_TIME_DIALOG);
                 break;
 
             //是否用邮件发送通知
@@ -341,7 +350,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //是否用短信发送通知
             case R.id.tv_sms_check:
-//                showSMSWidget();
+                showSMSWidget();
                 break;
 
             //显示短信编辑弹出框
@@ -351,7 +360,8 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //保存
             case R.id.tv_save:
-                if (TextUtils.isEmpty(contactList) && expAdapter.getMapV().hasNext()) {
+                //判断参会列表是否为空
+                if (TextUtils.isEmpty(contactList) && null != expAdapter && expAdapter.getMapV().hasNext()) {
                     String unitIdName = "_TN_C";
                     StringBuilder sbUnitName = new StringBuilder();
                     StringBuilder sbDeviceName = new StringBuilder();
@@ -400,21 +410,27 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 }
 
                 //短信id
-                if (TextUtils.isEmpty(smsId)) {
-                    Toast.makeText(this, "短信ID不能为空", Toast.LENGTH_SHORT).show();
-                    return;
+                if (smsNoticeFlag) {
+                    if (TextUtils.isEmpty(smsId)) {
+                        Toast.makeText(this, "短信ID不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
 
                 //短信主题
-                if (TextUtils.isEmpty(smsTitle)) {
-                    Toast.makeText(this, "短信主题不能为空", Toast.LENGTH_SHORT).show();
-                    return;
+                if (smsNoticeFlag) {
+                    if (TextUtils.isEmpty(smsTitle)) {
+                        Toast.makeText(this, "短信主题不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
 
                 //短信内容
-                if (TextUtils.isEmpty(smsContent)) {
-                    Toast.makeText(this, "短信内容不能为空", Toast.LENGTH_SHORT).show();
-                    return;
+                if (smsNoticeFlag) {
+                    if (TextUtils.isEmpty(smsContent)) {
+                        Toast.makeText(this, "短信内容不能为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
 
                 //联系人名称
@@ -443,6 +459,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 if (null != userInfo && !TextUtils.isEmpty(userInfo.id)) {
                     operatorId = userInfo.id;
                 }
+                //判断操作人是否为空
                 if (TextUtils.isEmpty(operatorId)) {
                     Toast.makeText(this, "申请人Id不能为空", Toast.LENGTH_SHORT).show();
                     return;
@@ -458,10 +475,10 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         endTime,
                         String.valueOf(durationTime),
                         "0",
-                        "1",
-                        smsId,
-                        smsTitle,
-                        smsContent,
+                        smsNoticeFlag ? "1" : "0",
+                        smsNoticeFlag ? smsId : "",
+                        smsNoticeFlag ? smsTitle : "",
+                        smsNoticeFlag ? smsContent : "",
                         contactsName,
                         phone,
                         operatorId
@@ -500,25 +517,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
             //退出登录
             case R.id.tv_log_out:
-                new MaterialDialog.Builder(this)
-                        .title("提示")
-                        .content("是否确认退出？")
-                        .negativeText("取消")
-                        .positiveText("确认")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                //修改登录状态
-                                PreferencesHelper.saveData(Account.IS_LOGIN, "false");
-                                //删除用户信息
-                                UserHelper.clearUserInfo(UserInfo.class);
-                                //跳转到登录页面
-                                LoginActivity.startActivity(NewConfActivity.this);
-                                dialog.dismiss();
-                            }
-                        })
-                        .build()
-                        .show();
+                logOut();
                 break;
 
             //帮助
@@ -548,7 +547,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .getHistoryList()
+                .getHistoryList(Integer.MAX_VALUE,1)
                 .compose(this.<DataList<ConfBean>>bindToLifecycle())
                 .compose(new ListDefaultTransformer<ConfBean>())
                 .subscribe(new RxSubscriber<List<ConfBean>>() {
@@ -573,8 +572,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
                         initDialog(DIALOG_TYPE_HISTORY,//
                                 historyAdapter,//
-                                new GridLayoutManager(NewConfActivity.this, 4, GridLayoutManager.VERTICAL, false),//
-                                null
+                                new GridLayoutManager(NewConfActivity.this, 4, GridLayoutManager.VERTICAL, false)//
                         );
                     }
 
@@ -592,7 +590,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         HttpUtils.getInstance(this)
                 .getRetofitClinet()
                 .builder(ConfApi.class)
-                .getTemplateList()
+                .getTemplateList(Integer.MAX_VALUE,1)
                 .compose(this.<DataList<ConfBean>>bindToLifecycle())
                 .compose(new ListDefaultTransformer<ConfBean>())
                 .subscribe(new RxSubscriber<List<ConfBean>>() {
@@ -617,8 +615,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
 
                         initDialog(DIALOG_TYPE_CONF_TEMPLATE,//
                                 templateAdapter,//
-                                new GridLayoutManager(NewConfActivity.this, 4, GridLayoutManager.VERTICAL, false),//
-                                null
+                                new GridLayoutManager(NewConfActivity.this, 4, GridLayoutManager.VERTICAL, false)//
                         );
                     }
 
@@ -627,6 +624,32 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                         Toast.makeText(NewConfActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+
+    private void getTemplate() {
+        //        HttpUtils.getInstance(this)
+//                .getRetofitClinet()
+//                .builder(ConfApi.class)
+//                .getTemplateList(PAGE_SIZE, pageNum)
+//                .compose(this.<DataList<ConfBean>>bindToLifecycle())
+//                .compose(new ListDefaultTransformer<ConfBean>())
+//                .subscribe(new RxSubscriber<List<ConfBean>>() {
+//                    @Override
+//                    public void onSuccess(List<ConfBean> list) {
+//                        initTemplateAdapter(list);
+//
+//                        initDialog(DIALOG_TYPE_CONF_TEMPLATE,//
+//                                templateAdapter,//
+//                                new GridLayoutManager(NewConfActivity.this, 4, GridLayoutManager.VERTICAL, false)//
+//                        );
+//                    }
+//
+//                    @Override
+//                    protected void onError(ResponeThrowable responeThrowable) {
+//                        Toast.makeText(NewConfActivity.this, R.string.error_msg, Toast.LENGTH_SHORT).show();
+//                    }
+//                });
     }
 
     /**
@@ -657,7 +680,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     }
 
     /**
-     * 获得短信模板列表显示短信编辑dialog
+     * 获得短信模板列表,显示短信编辑dialog
      */
     private void getSmsList() {
         HttpUtils.getInstance(this)
@@ -759,47 +782,28 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     }
 
     /**
-     * 将里面的文本转换成图片
-     *
-     * @param context 传递过来的文本数据
-     * @return 返回包含图片的数据
+     * 退出登录
      */
-    private String dialogTextToHtml(String context) {
-        //会场名称
-//        String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
-        String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
-        String hyhm = "<img src=\"file:///android_asset/icon_hyhm.png\" alt=\"\">";
-        String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
-        String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
-        String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
-        return context.replaceAll("&lt;--会场名称--&gt", hcmc)
-                .replaceAll("&lt;--会议号码--&gt", hyhm)
-                .replaceAll("&lt;--会议名称--&gt", hymc)
-                .replaceAll("&lt;--会议时间--&gt", hysj)
-                .replaceAll("&lt;--收件人--&gt", sjr);
-    }
-
-    /**
-     * 将html转换成html
-     *
-     * @param context
-     * @return
-     */
-    private String htmlToText(String context) {
-        //会场名称
-//        String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
-        String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
-        String hyhm = "<img src=\"file:///android_asset/icon_hyhm.png\" alt=\"\">";
-        String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
-        String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
-        String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
-
-        return context
-                .replaceAll(hcmc, "<--会场名称-->")
-                .replaceAll(hyhm, "<--会议号码-->")
-                .replaceAll(hymc, "<--会议名称-->")
-                .replaceAll(hysj, "<--会议时间-->")
-                .replaceAll(sjr, "<--收件人-->");
+    private void logOut() {
+        new MaterialDialog.Builder(this)
+                .title("提示")
+                .content("是否确认退出？")
+                .negativeText("取消")
+                .positiveText("确认")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        //修改登录状态
+                        PreferencesHelper.saveData(Account.IS_LOGIN, "false");
+                        //删除用户信息
+                        UserHelper.clearUserInfo(UserInfo.class);
+                        //跳转到登录页面
+                        LoginActivity.startActivity(NewConfActivity.this);
+                        dialog.dismiss();
+                    }
+                })
+                .build()
+                .show();
     }
 
     /**
@@ -873,7 +877,7 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                     public void onSuccess(List<DepartBean> departments) {
                         // 根据得到的参会人员列表departments设置右边的数据
                         setJoinList(departments);
-
+                        //设置右边的参会列表
                         setConfContent(currentTemplateConfBean);
                     }
 
@@ -942,7 +946,6 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                           String contactPeople,
                           String contactTelephone,
                           String operatorId) {
-
         Map<String, String> params = new HashMap<>();
         params.put("contactList", contactList);
         params.put("confParameters", confParameters);
@@ -980,54 +983,16 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 });
     }
 
-    private void saveConf() {
-        //        HttpUtils.getInstance(this)
-//                .getRetofitClinet()
-//                .builder(ConfApi.class)
-//                .saveConf(
-//                        contactList,
-//                        confParameters,
-//                        name,
-//                        schedulingTime,
-//                        endTime,
-//                        duration,
-//                        isEmail,
-//                        isSms,
-//                        smsId,
-//                        smsTitle,
-//                        smsContext,
-//                        contactPeople,
-//                        contactTelephone,
-//                        operatorId
-//                )
-//                .compose(this.<String>bindToLifecycle())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new RxSubscriber<String>() {
-//                    @Override
-//                    public void onSuccess(String s) {
-//                        Toast.makeText(NewConfActivity.this, "预约成功", Toast.LENGTH_SHORT).show();
-//                        finish();
-//                    }
-//
-//                    @Override
-//                    protected void onError(ResponeThrowable responeThrowable) {
-//                        Toast.makeText(NewConfActivity.this, "预约失败", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-    }
-
     /**
      * 初始化dialog
      *
      * @param title         dialog标题
      * @param adapter       dialog里recyclerview的适配器
      * @param layoutManager recyclerview的layoutmanager
-     * @param decoration
      */
-    private void initDialog(final String title, RecyclerView.Adapter adapter, RecyclerView.LayoutManager layoutManager, GridOffsetsItemDecoration decoration) {
+    private void initDialog(final String title, RecyclerView.Adapter adapter, RecyclerView.LayoutManager layoutManager) {
         //获得dialog填充的内容
-        final View dialogView = initDialogContent(adapter, layoutManager, decoration);
+        final View dialogView = initDialogContent(adapter, layoutManager);
         // 创建对话框
         dialog = new MaterialDialog.Builder(this)
                 .title(title)
@@ -1043,16 +1008,13 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     }
 
     @NonNull
-    private View initDialogContent(RecyclerView.Adapter adapter, RecyclerView.LayoutManager layoutManager, GridOffsetsItemDecoration decoration) {
+    private View initDialogContent(RecyclerView.Adapter adapter, RecyclerView.LayoutManager layoutManager) {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.refresh_recycler_view, null);
         TwinklingRefreshLayout refreshLayout = (TwinklingRefreshLayout) dialogView.findViewById(R.id.refreshLayout);
         RecyclerView recyclerView = (RecyclerView) dialogView.findViewById(R.id.rv_list);
         //设置布局管理器和适配器
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-        if (null != decoration) {
-            recyclerView.addItemDecoration(decoration);
-        }
         //设置刷新的头部
         ProgressLayout progressLayout = new ProgressLayout(this);
         refreshLayout.setHeaderView(progressLayout);
@@ -1065,6 +1027,10 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         refreshLayout.setEnableOverScroll(false);
         //设置刷新的view
         refreshLayout.setTargetView(recyclerView);
+
+        //设置刷新和上拉加载都不能使用
+        refreshLayout.setEnableRefresh(false);
+        refreshLayout.setEnableLoadmore(false);
         return dialogView;
     }
 
@@ -1093,14 +1059,32 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     /**
      * 显示会议开始时间对话框
      */
-    private void showStartTimeDialog() {
+    private void showTimeDialog(int type) {
+        String title = type == START_TIME_DIALOG ? "请选择会议开始时间" : "请选择会议结束时间";
+        long minMillseconds = type == START_TIME_DIALOG ? System.currentTimeMillis() : startTimeLong;
+
         startTimeDialog = new TimePickerDialog.Builder()
                 .setCallBack(new OnDateSetListener() {
                     @Override
                     public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
-                        startTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
-                        startTimeLong = millseconds;
-                        showEndTimeDialog();
+                        switch (type) {
+                            case START_TIME_DIALOG:
+                                startTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
+                                startTimeLong = millseconds;
+                                showTimeDialog(END_TIME_DIALOG);
+                                break;
+
+                            case END_TIME_DIALOG:
+                                endTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
+                                endTimeLong = millseconds;
+                                long minute = (endTimeLong - startTimeLong) / 1000 / 60;
+                                tvConfTime.setText(startTime);
+                                tvDuration.setText("预计" + endTime + "结束会议,时长" + minute + "分钟");
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
                 })
                 .setCancelStringId("Cancel")
@@ -1110,9 +1094,9 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 .setDayText("日")
                 .setHourText("时")
                 .setMinuteText("分")
-                .setTitleStringId("请选择会议开始时间")
+                .setTitleStringId(title)
                 .setCyclic(false)
-                .setMinMillseconds(System.currentTimeMillis())
+                .setMinMillseconds(minMillseconds)
                 .setMaxMillseconds(System.currentTimeMillis() + tenYears)
                 .setCurrentMillseconds(System.currentTimeMillis())
                 .setThemeColor(ContextCompat.getColor(this, R.color.timepicker_dialog_bg))
@@ -1121,44 +1105,8 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 .setWheelItemTextSelectorColor(ContextCompat.getColor(this, R.color.timepicker_toolbar_bg))
                 .setWheelItemTextSize(12)
                 .build();
+
         startTimeDialog.show(getSupportFragmentManager(), "all");
-    }
-
-    /**
-     * 显示会议结束时间对话框
-     */
-    private void showEndTimeDialog() {
-        endTimeDialog = new TimePickerDialog.Builder()
-                .setCallBack(new OnDateSetListener() {
-                    @Override
-                    public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
-                        endTime = DateUtil.longToString(millseconds, DateUtil.FORMAT_DATE_TIME_SECOND_HORIZONTAL);
-                        endTimeLong = millseconds;
-                        long minute = (endTimeLong - startTimeLong) / 1000 / 60;
-                        tvConfTime.setText(startTime);
-                        tvDuration.setText("预计" + endTime + "结束会议,时长" + minute + "分钟");
-
-                    }
-                })
-                .setCancelStringId("Cancel")
-                .setSureStringId("Sure")
-                .setYearText("年")
-                .setMonthText("月")
-                .setDayText("日")
-                .setHourText("时")
-                .setMinuteText("分")
-                .setTitleStringId("请选择会议结束时间")
-                .setCyclic(false)
-                .setMinMillseconds(startTimeLong)
-                .setMaxMillseconds(System.currentTimeMillis() + tenYears)
-                .setCurrentMillseconds(System.currentTimeMillis())
-                .setThemeColor(ContextCompat.getColor(this, R.color.timepicker_dialog_bg))
-                .setType(Type.ALL)
-                .setWheelItemTextNormalColor(ContextCompat.getColor(this, R.color.timetimepicker_default_text_color))
-                .setWheelItemTextSelectorColor(ContextCompat.getColor(this, R.color.timepicker_toolbar_bg))
-                .setWheelItemTextSize(12)
-                .build();
-        endTimeDialog.show(getSupportFragmentManager(), "all");
     }
 
     /**
@@ -1223,7 +1171,8 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
     }
 
     /**
-     * 通过历史会议的bean或会议模板的bean设置内容,如果confBean为空代表重置
+     * 通过历史会议的bean或会议模板的bean设置内容,
+     * 如果confBean为空代表重置
      *
      * @param confBean
      */
@@ -1258,7 +1207,10 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
         reSMSContent.setHtml(textToHtml(smsContent));//短信内容
     }
 
-    //获取到选中的employee集合
+    /**
+     * 获取到选中的employee集合
+     * @param event
+     */
     @Subscribe
     public void onConfirmEvent(ConfirmEvent event) {
         //当选中联系人的时候把通过历史会议选中的人员列表至为空
@@ -1370,4 +1322,89 @@ public class NewConfActivity extends BaseActivity implements View.OnClickListene
                 .replaceAll("&lt;--收件人--&gt;", sjr);
     }
 
+    /**
+     * 将里面的文本转换成图片
+     *
+     * @param context 传递过来的文本数据
+     * @return 返回包含图片的数据
+     */
+    private String dialogTextToHtml(String context) {
+        //会场名称
+//        String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
+        String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
+        String hyhm = "<img src=\"file:///android_asset/icon_hyhm.png\" alt=\"\">";
+        String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
+        String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
+        String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
+
+        return context.replaceAll("&lt;--会场名称--&gt", hcmc)
+                .replaceAll("&lt;--会议号码--&gt", hyhm)
+                .replaceAll("&lt;--会议名称--&gt", hymc)
+                .replaceAll("&lt;--会议时间--&gt", hysj)
+                .replaceAll("&lt;--收件人--&gt", sjr);
+    }
+
+    /**
+     * 将html转换成html
+     *
+     * @param context
+     * @return
+     */
+    private String htmlToText(String context) {
+        //会场名称
+//        String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
+        String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
+        String hyhm = "<img src=\"file:///android_asset/icon_hyhm.png\" alt=\"\">";
+        String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
+        String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
+        String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
+
+        return context
+                .replaceAll(hcmc, "<--会场名称-->")
+                .replaceAll(hyhm, "<--会议号码-->")
+                .replaceAll(hymc, "<--会议名称-->")
+                .replaceAll(hysj, "<--会议时间-->")
+                .replaceAll(sjr, "<--收件人-->");
+    }
+
+    /**
+     * 预约会议过时的接口
+     */
+    @Deprecated
+    private void saveConf() {
+        //        HttpUtils.getInstance(this)
+//                .getRetofitClinet()
+//                .builder(ConfApi.class)
+//                .saveConf(
+//                        contactList,
+//                        confParameters,
+//                        name,
+//                        schedulingTime,
+//                        endTime,
+//                        duration,
+//                        isEmail,
+//                        isSms,
+//                        smsId,
+//                        smsTitle,
+//                        smsContext,
+//                        contactPeople,
+//                        contactTelephone,
+//                        operatorId
+//                )
+//                .compose(this.<String>bindToLifecycle())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new RxSubscriber<String>() {
+//                    @Override
+//                    public void onSuccess(String s) {
+//                        Toast.makeText(NewConfActivity.this, "预约成功", Toast.LENGTH_SHORT).show();
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    protected void onError(ResponeThrowable responeThrowable) {
+//                        Toast.makeText(NewConfActivity.this, "预约失败", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+    }
 }

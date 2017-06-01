@@ -24,7 +24,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.miao.freesizedraggablelayout.DetailView;
 import com.miao.freesizedraggablelayout.FreeSizeDraggableLayout;
-import com.orhanobut.logger.Logger;
 import com.zxwl.frame.R;
 import com.zxwl.frame.activity.ConfControlActivity;
 import com.zxwl.frame.activity.SplitScreenDialogActivity;
@@ -36,8 +35,6 @@ import com.zxwl.frame.bean.ConferenceInfo;
 import com.zxwl.frame.bean.ConferenceStatus;
 import com.zxwl.frame.bean.ConfirmEvent;
 import com.zxwl.frame.bean.Site;
-import com.zxwl.frame.bean.SiteInfo;
-import com.zxwl.frame.bean.SiteStatus;
 import com.zxwl.frame.net.api.ConfApi;
 import com.zxwl.frame.net.callback.RxSubscriber;
 import com.zxwl.frame.net.exception.ResponeThrowable;
@@ -101,7 +98,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
     private ConferenceStatus conferenceStatus;//会议状态
     private List<Site> siteList = new ArrayList<>();
 
-    private int currentIndex;//当前移动的下标
+    private int currentIndex;//当前recyclerview移动的下标
 
     private String smcConfId;
     private String confId;
@@ -155,7 +152,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         tvSelectTime = (TextView) view.findViewById(R.id.tv_select_time);
 
         //TODO 测试代码，正式环境删除
-        view.findViewById(R.id.tv_poll_lable).setOnClickListener(this);
+//        view.findViewById(R.id.tv_poll_lable).setOnClickListener(this);
     }
 
     @Override
@@ -174,14 +171,14 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
         confId = (String) arguments.get(ConfControlActivity.CONF_ID);
 
         //TODO 测试代码，正式环境删除
-        Site site = null;
-        for (int i = 0; i < 5; i++) {
-            site = new Site();
-            site.siteInfo = new SiteInfo();
-            site.siteStatus = new SiteStatus();
-            site.siteInfo.name = "name-" + i;
-            siteList.add(site);
-        }
+//        Site site = null;
+//        for (int i = 0; i < 5; i++) {
+//            site = new Site();
+//            site.siteInfo = new SiteInfo();
+//            site.siteStatus = new SiteStatus();
+//            site.siteInfo.name = "name-" + i;
+//            siteList.add(site);
+//        }
         rightAdapter = new SplitScreenRightAdapter(siteList);
         rvList.setAdapter(rightAdapter);
         rvList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -282,8 +279,7 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
                 .compose(this.<String>bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        s -> {
+                .subscribe(s -> {
                             try {
                                 if (TextUtils.isEmpty(s)) {
                                     Toast.makeText(mContext, R.string.error_msg, Toast.LENGTH_SHORT).show();
@@ -297,14 +293,15 @@ public class SplitScreenFragment extends BaseFragment implements CallbackItemTou
 
                                 //会议状态
                                 String s2 = array.getString(1);
-                                Logger.i(s2);
                                 conferenceStatus = gson.fromJson(s2, ConferenceStatus.class);
 
                                 //参会的会场列表
                                 String s3 = array.getString(2);
-                                Logger.i(s3);
                                 siteList = gson.fromJson(s3, new TypeToken<List<Site>>() {
                                 }.getType());
+
+                                //设置会议名称
+                                tvTitle.setText(conferenceStatus.name);
 
                                 //设置bean的操作状态
                                 for (int i = 0, count = siteList.size(); i < count; i++) {

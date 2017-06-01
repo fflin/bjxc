@@ -16,7 +16,6 @@ import okhttp3.ResponseBody;
  * data:2017/4/20 14:29
  * ClassName: ${Class_Name}
  */
-
 public class LogInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {

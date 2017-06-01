@@ -169,7 +169,6 @@ public class ConfControlFragment extends BaseFragment {
         //获得会议信息
         getConfInfo();
 
-
         initRxBus();
     }
 

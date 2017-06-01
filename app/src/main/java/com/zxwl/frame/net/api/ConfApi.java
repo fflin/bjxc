@@ -35,7 +35,7 @@ public interface ConfApi {
      * @return
      */
     @GET(Urls.QUERY_HISTORY_LIST)
-    Observable<DataList<ConfBean>> getHistoryList();
+    Observable<DataList<ConfBean>> getHistoryList(@Query("pageSize") int pageSize, @Query("pageNum") int pageNum);
 
     /**
      * 获得会议模板列表
@@ -43,7 +43,7 @@ public interface ConfApi {
      * @return
      */
     @GET(Urls.QUERY_TEMPLATE_LIST)
-    Observable<DataList<ConfBean>> getTemplateList();
+    Observable<DataList<ConfBean>> getTemplateList(@Query("pageSize") int pageSize, @Query("pageNum") int pageNum);
 
     /**
      * 获得短信模板列表

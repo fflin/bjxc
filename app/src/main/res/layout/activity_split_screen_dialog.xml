@@ -595,7 +595,7 @@
             android:gravity="center"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
-            android:text="三画面"/>
+            android:text="十三画面"/>
 
         <ImageView
             android:id="@+id/iv_thirteen_a"
@@ -605,7 +605,7 @@
             android:layout_marginLeft="12dp"
             android:layout_marginTop="16dp"
             android:layout_toRightOf="@id/tv_one_lable"
-            android:src="@mipmap/icon_split_three_a"/>
+            android:src="@mipmap/icon_split_thirteen_a"/>
 
         <ImageView
             android:id="@+id/iv_thirteen_b"

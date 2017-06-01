@@ -110,8 +110,6 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
         }
     }
 
-    //&lt;p&gt;您好&lt;--发送人--&gt;，&amp;nbsp;&amp;nbsp;&amp;nbsp;原定于&lt;--会议时间--&gt;召开的&lt;--会议名称--&gt;，因故取消！&amp;nbsp;&amp;nbsp;如有疑问，请联系视频管理员！&lt;--会场名称--&gt;&lt;/p&gt;
-    //&amp;amp;lt;p&amp;amp;gt;各位领导、同事：兹定于&amp;lt;--会议时间--&amp;gt;;召开&amp;lt;--会场名称--&amp;gt;;，请您准时参加&amp;amp;lt;/p&amp;amp;gt;
     @Override
     protected void setListener() {
         tvTitle.setOnClickListener(this);
@@ -189,7 +187,6 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
         return dialogView;
     }
 
-
     /**
      * 会议审批通过的接口
      */
@@ -259,27 +256,6 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
                         finish();
                     }
                 });
-    }
-
-    /**
-     * 将里面的文本转换成图片
-     *
-     * @param context 传递过来的文本数据
-     * @return 返回包含图片的数据
-     */
-    private String textToHtml(String context) {
-        //会场名称
-        //String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
-        String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
-        String hyhm = "<img src=\"file:///android_asset/icon_hyhm.png\" alt=\"\">";
-        String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
-        String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
-        String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
-        return context.replaceAll("&amp;lt;--会场名称--&amp;gt", hcmc)
-                .replaceAll("&amp;lt;--会议号码--&amp;gt", hyhm)
-                .replaceAll("&amp;lt;--会议名称--&amp;gt", hymc)
-                .replaceAll("&amp;lt;--会议时间--&amp;gt", hysj)
-                .replaceAll("&amp;lt;--收件人--&amp;gt", sjr);
     }
 
     /**
@@ -361,5 +337,26 @@ public class ConfApprovalDialogActivity extends BaseActivity implements View.OnC
                         Toast.makeText(ConfApprovalDialogActivity.this, responeThrowable.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    /**
+     * 将里面的文本转换成图片
+     *
+     * @param context 传递过来的文本数据
+     * @return 返回包含图片的数据
+     */
+    private String textToHtml(String context) {
+        //会场名称
+        //String imgUrl = <img src="file:///android_asset/ic_launcher.png" alt="">;
+        String hcmc = "<img src=\"file:///android_asset/icon_hcmc.png\" alt=\"\">";
+        String hyhm = "<img src=\"file:///android_asset/icon_hyhm.png\" alt=\"\">";
+        String hymc = "<img src=\"file:///android_asset/icon_hymc.png\" alt=\"\">";
+        String hysj = "<img src=\"file:///android_asset/icon_hysj.png\" alt=\"\">";
+        String sjr = "<img src=\"file:///android_asset/icon_sjr.png\" alt=\"\">";
+        return context.replaceAll("&amp;lt;--会场名称--&amp;gt", hcmc)
+                .replaceAll("&amp;lt;--会议号码--&amp;gt", hyhm)
+                .replaceAll("&amp;lt;--会议名称--&amp;gt", hymc)
+                .replaceAll("&amp;lt;--会议时间--&amp;gt", hysj)
+                .replaceAll("&amp;lt;--收件人--&amp;gt", sjr);
     }
 }
