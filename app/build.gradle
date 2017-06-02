@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
+//使用了 com.android.application 插件。该插件用于编译 Android 应用
 
+
+//android{}配置了所有 android 构建所需的参数,这也是Android DSL 的入口
 android {
     def androidVersion = rootProject.ext.android
 

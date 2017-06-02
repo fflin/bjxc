@@ -7,8 +7,8 @@ package com.zxwl.frame.net;
  */
 public class Urls {
 
-    public static final String BASE_URL = "http://10.10.31.174/bjxc/";//北京测试地址
-//    public static final String BASE_URL = "http://192.168.0.147:8080/bjxc/";//公司测试地址
+//    public static final String BASE_URL = "http://10.10.31.174/bjxc/";//北京测试地址
+    public static final String BASE_URL = "http://192.168.0.147:8080/bjxc/";//公司测试地址
 //    public static final String BASE_URL = "http://192.168.222.233:10119/bjxc/";
 
     /**
